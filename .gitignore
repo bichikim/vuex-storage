@@ -1,0 +1,30 @@
+## package folders
+node_modules/
+bower_components/
+flow-typed/npm/
+
+## bundle folders
+public/
+#dist/
+
+## docs
+docs/
+
+## log directories and files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+coverage/
+debug.log*
+
+
+## environment files
+#yarn.lock
+package-lock.json
+.env
+
+## Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
