@@ -70,6 +70,9 @@
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
-    "lodash": "^4.17.10"
+    "infinity-assign": "^0.0.4",
+    "lodash": "^4.17.10",
+    "vue": "^2.5.16",
+    "vuex": "^3.0.1"
   }
 }

@@ -2,7 +2,6 @@ import {cloneDeep, omit, pick} from 'lodash'
 import {Store} from 'vuex'
 import assign from 'infinity-assign'
 // saving mutation name
-const CALL_NAME = '__plugin_vuex_storage__'
 const storeExceptOrOnly = (state: any, except: string[], only: string[]) => {
   let clonedStore = {}
   if(except){
@@ -34,9 +33,11 @@ export interface IVuexStorageOptions {
 export default (options: IVuexStorageOptions = {}) => {
   const {session = {}, local = {}, key = 'vuex'} = options
   return (store: Store<any>) => {
-    if(!process.browser){
+    const {browser = false} = process || window.process || {}
+    if(!browser){
       return
     }
+
     const {sessionStorage, localStorage} = window
     const sessionData = sessionStorage.getItem(key)
     const localData = localStorage.getItem(key)
@@ -53,14 +54,6 @@ export default (options: IVuexStorageOptions = {}) => {
       // skip
     }
 
-    // add saving mutation
-    store.hotUpdate({
-      mutations: {
-        [CALL_NAME](state, payload) {
-          assign(state, payload, {safeMode: true})
-        },
-      },
-    })
     // saving store
     const save = (state: any, session: any, local: any) => {
       sessionStorage.setItem(key,
@@ -68,8 +61,8 @@ export default (options: IVuexStorageOptions = {}) => {
       localStorage.setItem(key,
         JSON.stringify(storeExceptOrOnly(store.state, local.except, local.only)))
     }
-    store.commit(CALL_NAME, sessionState)
-    store.commit(CALL_NAME, localState)
+    assign(store.state, sessionState)
+    assign(store.state, localState)
     save(store.state, session, local)
     store.subscribe((mutation, state) => {
       save(state, session, local)
