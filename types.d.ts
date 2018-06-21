@@ -1,2 +1,6 @@
-import MyTypescript from './src'
-export {MyTypescript}
+import vuexStorage, {IVuexStorageOptions} from './src'
+export default vuexStorage
+
+export {
+  IVuexStorageOptions,
+}
