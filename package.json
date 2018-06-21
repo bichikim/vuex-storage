@@ -1,7 +1,7 @@
 {
-  "name": "my-typescript",
+  "name": "vuex-storage",
   "version": "0.0.1",
-  "description": "A quick way to start typescriptp",
+  "description": "vuex-storage",
   "author": "bichi",
   "main": "dist/app.js",
   "types": "types.d.ts",
@@ -14,15 +14,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bichikim/my-typescript.git"
+    "url": "git+https://github.com/bichikim/vuex-storage.git"
   },
   "keywords": [
     "typescript"
   ],
   "bugs": {
-    "url": "https://github.com/bichikim/my-typescript/issues"
+    "url": "https://github.com/bichikim/vuex-storage/issues"
   },
-  "homepage": "https://github.com/bichikim/my-typescript#readme",
+  "homepage": "https://github.com/bichikim/vuex-storage#readme",
   "devDependencies": {
     "@types/chai": "^4.1.3",
     "@types/lodash": "^4.14.109",
