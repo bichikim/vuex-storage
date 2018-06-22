@@ -22,7 +22,6 @@ export interface IVuexStorageOptions {
     only?: string[],
   }
   key?: string
-  isNuxt?: boolean
 }
 
 /**
