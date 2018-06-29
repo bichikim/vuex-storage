@@ -32,7 +32,7 @@ export interface IVuexStorageOptions {
 export default (options: IVuexStorageOptions = {}) => {
   const {session = {}, local = {}, key = 'vuex'} = options
   return (store: Store<any>) => {
-    if(process.client){
+    if(!process.client){
       return
     }
 
