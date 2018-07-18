@@ -1,6 +1,6 @@
 {
   "name": "vuex-storage",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "vuex-storage",
   "author": "bichi",
   "main": "dist/app.js",
@@ -25,12 +25,12 @@
   "homepage": "https://github.com/bichikim/vuex-storage#readme",
   "devDependencies": {
     "@types/chai": "^4.1.4",
-    "@types/lodash": "^4.14.110",
-    "@types/mocha": "^5.2.3",
+    "@types/lodash": "^4.14.112",
+    "@types/mocha": "^5.2.5",
     "@types/sinon": "^5.0.1",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
-    "babel-eslint": "^8.2.5",
+    "babel-eslint": "^8.2.6",
     "babel-loader": "^7.1.4",
     "babel-plugin-lodash": "^3.3.4",
     "babel-polyfill": "^6.26.0",
@@ -40,10 +40,10 @@
     "babel-preset-stage-3": "^6.24.1",
     "chai": "^4.1.2",
     "codecov": "^3.0.2",
-    "eslint": "^5.0.1",
+    "eslint": "^5.1.0",
     "eslint-friendly-formatter": "^4.0.1",
     "eslint-loader": "^2.0.0",
-    "eslint-plugin-html": "^4.0.5",
+    "eslint-plugin-html": "^4.0.3",
     "eslint-plugin-promise": "^3.8.0",
     "eslint-plugin-typescript": "^0.12.0",
     "eslint-plugin-vue": "^4.5.0",
@@ -70,8 +70,8 @@
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
-    "infinity-assign": "^0.0.4",
-    "lodash": "^4.17.10",
+    "infinity-assign": "^0.0.6",
+    "lodash": "^4.17.5",
     "vue": "^2.5.16",
     "vuex": "^3.0.1"
   }
