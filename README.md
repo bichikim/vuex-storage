@@ -3,7 +3,7 @@
 
 [![LICENSE IMAGE]](https://www.npmjs.org/package/vuex-storage)
 ![npm](https://img.shields.io/npm/v/vuex-storage.svg)
-![Codecov](https://img.shields.io/codecov/c/github/codecov/vuex-storage.svg)
+![Codecov](https://img.shields.io/codecov/c/github/bichikim/vuex-storage.svg)
 ![Travis](https://img.shields.io/travis/bichikim/vuex-storage.svg)
 
 
