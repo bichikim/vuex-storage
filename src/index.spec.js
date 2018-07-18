@@ -1,16 +1,18 @@
+/* eslint-disable no-global-assign */
 import vuexStorage from './'
 import Vuex from 'vuex'
 import Vue from 'vue'
 describe('my-typescript', () => {
-  window.process = {browser: true}
+  if(!window.process){
+    window.process = {}
+  }
+  process.client = true
   Vue.config.productionTip = false
   Vue.config.devtools = false
   Vue.use(Vuex)
   let store
   const key = 'test'
   describe('use case 1', () => {
-
-
     it('should init', () => {
       window.sessionStorage.setItem(key, '{"test":"test"}')
       window.localStorage.setItem(key, '{"test":"test"}')
@@ -101,7 +103,7 @@ describe('my-typescript', () => {
   })
   describe('use case 3', () => {
     it('should save changed state', () => {
-      window.process = {browser: false}
+      process.client = false
       window.sessionStorage.setItem(key, '{"test":"test"}')
       window.localStorage.setItem(key, '{"test":"test"}')
       store = new Vuex.Store({
@@ -125,7 +127,7 @@ describe('my-typescript', () => {
   })
   describe('use case 4', () => {
     it('should save changed state', () => {
-      window.process = null
+      process.client = false
       window.sessionStorage.setItem(key, '{"test":"test"}')
       window.localStorage.setItem(key, '{"test":"test"}')
       store = new Vuex.Store({

@@ -1,6 +1,6 @@
+import assign from 'infinity-assign'
 import {cloneDeep, omit, pick} from 'lodash'
 import {Store} from 'vuex'
-import assign from 'infinity-assign'
 // saving mutation name
 const storeExceptOrOnly = (state: any, except: string[], only: string[]) => {
   let clonedStore = {}
@@ -32,8 +32,7 @@ export interface IVuexStorageOptions {
 export default (options: IVuexStorageOptions = {}) => {
   const {session = {}, local = {}, key = 'vuex'} = options
   return (store: Store<any>) => {
-    const {browser = false} = process || window.process || {}
-    if(!browser){
+    if(!process.client){
       return
     }
 
