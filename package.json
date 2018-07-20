@@ -1,6 +1,6 @@
 {
   "name": "vuex-storage",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "vuex-storage",
   "author": "bichi",
   "main": "dist/app.js",
@@ -70,7 +70,6 @@
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
-    "infinity-assign": "^0.0.6",
     "lodash": "^4.17.5",
     "vue": "^2.5.16",
     "vuex": "^3.0.1"
