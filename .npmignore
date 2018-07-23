@@ -3,7 +3,6 @@ media/
 build/
 config/
 docs/
-types/
 .idea/
 coverage/
 .eslintrc.js
