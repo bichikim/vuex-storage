@@ -1,4 +1,4 @@
-#Vuex-storage
+# Vuex-storage
 > vuex browser storage plugin
 
 [![LICENSE IMAGE]](https://www.npmjs.org/package/vuex-storage)
