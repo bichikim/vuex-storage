@@ -10,5 +10,5 @@ module.exports = webpackMerge(WebpackBaseConfig, {
   },
   devtool: 'source-map',
   mode: 'production',
-  externals: ['lodash', 'infinity-assign', 'vue', 'vuex']
+  externals: ['lodash', 'vue', 'vuex']
 })
