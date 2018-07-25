@@ -6,7 +6,7 @@ describe('my-typescript', () => {
   if(!window.process){
     window.process = {}
   }
-  process.client = true
+  process.server = false
   Vue.config.productionTip = false
   Vue.config.devtools = false
   Vue.use(Vuex)
@@ -103,7 +103,7 @@ describe('my-typescript', () => {
   })
   describe('use case 3', () => {
     it('should save changed state', () => {
-      process.client = false
+      process.server = true
       window.sessionStorage.setItem(key, '{"test":"test"}')
       window.localStorage.setItem(key, '{"test":"test"}')
       store = new Vuex.Store({
@@ -127,7 +127,7 @@ describe('my-typescript', () => {
   })
   describe('use case 4', () => {
     it('should save changed state', () => {
-      process.client = false
+      process.server = true
       window.sessionStorage.setItem(key, '{"test":"test"}')
       window.localStorage.setItem(key, '{"test":"test"}')
       store = new Vuex.Store({
