@@ -31,7 +31,7 @@ export interface IVuexStorageOptions {
 export default (options: IVuexStorageOptions = {}) => {
   const {session = {}, local = {}, key = 'vuex'} = options
   return (store: Store<any>): 0 => {
-    if(process.server){
+    if(process.server && !window){
       // webpack compiler change this into if(!process.server) so it must return any value
       return 0
     }
