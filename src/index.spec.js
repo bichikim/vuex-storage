@@ -6,7 +6,6 @@ describe('my-typescript', () => {
   if(!window.process){
     window.process = {}
   }
-  process.server = false
   Vue.config.productionTip = false
   Vue.config.devtools = false
   Vue.use(Vuex)
@@ -18,12 +17,12 @@ describe('my-typescript', () => {
       window.localStorage.setItem(key, '{"test":"test"}')
       store = new Vuex.Store({
         state: {
-          test: null
+          test: null,
         },
         mutations: {
           changeTest(state) {
             state.test = 'testDone'
-          }
+          },
         },
         plugins: [
           vuexStorage({
@@ -33,9 +32,9 @@ describe('my-typescript', () => {
             },
             local: {
               only: ['test'],
-            }
+            },
           }),
-        ]
+        ],
       })
       expect(store.state.test).to.equal('test')
     })
@@ -45,12 +44,12 @@ describe('my-typescript', () => {
       window.localStorage.setItem(key, '{"test":"test"}')
       store = new Vuex.Store({
         state: {
-          test: null
+          test: null,
         },
         mutations: {
           changeTest(state) {
             state.test = 'testDone'
-          }
+          },
         },
         plugins: [
           vuexStorage({
@@ -60,9 +59,9 @@ describe('my-typescript', () => {
             },
             local: {
               only: ['test'],
-            }
+            },
           }),
-        ]
+        ],
       })
       store.commit('changeTest')
       expect(window.sessionStorage.getItem(key)).to.equal('{"test":"testDone"}')
@@ -77,12 +76,12 @@ describe('my-typescript', () => {
       window.localStorage.setItem(key, '{"test":"test"}')
       store = new Vuex.Store({
         state: {
-          test: null
+          test: null,
         },
         mutations: {
           changeTest(state) {
             state.test = 'testDone'
-          }
+          },
         },
         plugins: [
           vuexStorage({
@@ -91,9 +90,9 @@ describe('my-typescript', () => {
               except: [],
             },
             local: {
-            }
+            },
           }),
-        ]
+        ],
       })
       store.commit('changeTest')
       expect(window.sessionStorage.getItem(key)).to.equal('{"test":"testDone"}')
@@ -103,21 +102,20 @@ describe('my-typescript', () => {
   })
   describe('use case 3', () => {
     it('should save changed state', () => {
-      process.server = true
       window.sessionStorage.setItem(key, '{"test":"test"}')
       window.localStorage.setItem(key, '{"test":"test"}')
       store = new Vuex.Store({
         state: {
-          test: null
+          test: null,
         },
         mutations: {
           changeTest(state) {
             state.test = 'testDone'
-          }
+          },
         },
         plugins: [
           vuexStorage(),
-        ]
+        ],
       })
       store.commit('changeTest')
       expect(window.sessionStorage.getItem(key)).to.equal('{"test":"test"}')
@@ -127,22 +125,22 @@ describe('my-typescript', () => {
   })
   describe('use case 4', () => {
     it('should save changed state', () => {
-      process.server = true
       window.sessionStorage.setItem(key, '{"test":"test"}')
       window.localStorage.setItem(key, '{"test":"test"}')
       store = new Vuex.Store({
         state: {
-          test: null
+          test: null,
         },
         mutations: {
           changeTest(state) {
             state.test = 'testDone'
-          }
+          },
         },
         plugins: [
           vuexStorage({
+            isServer: true,
           }),
-        ]
+        ],
       })
       store.commit('changeTest')
       expect(window.sessionStorage.getItem(key)).to.equal('{"test":"test"}')

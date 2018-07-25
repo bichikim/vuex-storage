@@ -12,6 +12,7 @@ const storeExceptOrOnly = (state: any, except: string[], only: string[]) => {
 }
 
 export interface IVuexStorageOptions {
+  isServer?: boolean,
   session?: {
     except?: string[],
     only?: string[],
@@ -29,9 +30,9 @@ export interface IVuexStorageOptions {
  * @return {(store: Store<any>) => undefined}
  */
 export default (options: IVuexStorageOptions = {}) => {
-  const {session = {}, local = {}, key = 'vuex'} = options
+  const {session = {}, local = {}, key = 'vuex', isServer} = options
   return (store: Store<any>): 0 => {
-    if(process.server && !window){
+    if(isServer){
       // webpack compiler change this into if(!process.server) so it must return any value
       return 0
     }
