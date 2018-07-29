@@ -24,12 +24,12 @@
   },
   "include": [
     "src/**/*.ts",
-    "types/**/*.d.ts"
+    "types/**/*.d.ts",
+    "node_modules/**/*.d.ts"
   ],
   "exclude": [
     ".keep",
-    ".templates",
-    "node_modules"
+    ".templates"
   ],
   "compileOnSave": false
 }

@@ -59,7 +59,7 @@ export default (options: IVuexStorageOptions = {}) => {
       localStorage.setItem(key,
         JSON.stringify(storeExceptOrOnly(store.state, local.except, local.only)))
     }
-    store.replaceState(Object.assign(store.state, sessionState, localState))
+    store.replaceState(Object.assign({}, store.state, sessionState, localState))
     save(store.state, session, local)
     store.subscribe((mutation, state) => {
       save(state, session, local)
