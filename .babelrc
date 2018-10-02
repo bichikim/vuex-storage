@@ -1,14 +1,8 @@
 {
-  "presets": [[
-    "env", {
-      "targets": {
-        "browser": [
-          "> 1%",
-          "last 2 versions",
-          "not ie <= 8"
-        ]
-      },
-      "modules": false
+  "presets": ["@nuxtjs/babel-preset-app"],
+  "env": {
+    "test": {
+      "presets": ["@nuxtjs/babel-preset-app"]
     }
-  ], "stage-1", "stage-2", "stage-3"]
+  }
 }

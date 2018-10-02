@@ -1,68 +1,67 @@
 import {cloneDeep, omit, pick} from 'lodash'
 import {Store} from 'vuex'
+import {IVuexStorageOptions, IFilterOptions} from './types'
+import {Plugin} from 'vuex'
 // saving mutation name
-const storeExceptOrOnly = (state: any, except: string[], only: string[]) => {
-  let clonedStore = {}
+function storeExceptOrOnly(state: any, except: string[], only: string[]): any {
+  let clonedState: any = {}
   if(except){
-    clonedStore = omit(cloneDeep(state), except)
+    clonedState = omit(cloneDeep(state), except)
   }else if(only){
-    clonedStore = pick(cloneDeep(state), only)
+    clonedState = pick(cloneDeep(state), only)
   }
-  return clonedStore
-}
-
-export interface IVuexStorageOptions {
-  isServer?: boolean,
-  session?: {
-    except?: string[],
-    only?: string[],
-  }
-  local?: {
-    except?: string[],
-    only?: string[],
-  }
-  key?: string
+  return clonedState
 }
 
 /**
  * Save Vuex store in local and session
- * @param {IVuexStorageOptions} options
- * @return {(store: Store<any>) => undefined}
  */
-export default (options: IVuexStorageOptions = {}) => {
-  const {session = {}, local = {}, key = 'vuex', isServer} = options
+function vuexStorage<S>(options: IVuexStorageOptions = {}): Plugin<S> {
+  const {
+    session = {},
+    local = {},
+    key = 'vuex',
+    isServer,
+    isRestore = true,
+    isRun = true,
+  } = options
   return (store: Store<any>) => {
-    if(isServer){
+    if(isServer || !isRun){
       return
     }
 
     const {sessionStorage, localStorage} = window
-    const sessionData = sessionStorage.getItem(key)
-    const localData = localStorage.getItem(key)
-    let sessionState = {}
-    let localState = {}
-    try{
-      sessionState = JSON.parse(sessionData)
-    }catch(error){
-      // skip
-    }
-    try{
-      localState = JSON.parse(localData)
-    }catch(error){
-      // skip
-    }
-
     // saving store
-    const save = (state: any, session: any, local: any) => {
+    const save = (state: any, session: IFilterOptions, local: IFilterOptions) => {
       sessionStorage.setItem(key,
         JSON.stringify(storeExceptOrOnly(store.state, session.except, session.only)))
       localStorage.setItem(key,
         JSON.stringify(storeExceptOrOnly(store.state, local.except, local.only)))
     }
-    store.replaceState(Object.assign({}, store.state, sessionState, localState))
+
+    if(isRestore){
+      const sessionData = sessionStorage.getItem(key)
+      const localData = localStorage.getItem(key)
+      let sessionState = {}
+      let localState = {}
+      try{
+        sessionState = JSON.parse(sessionData)
+      }catch(error){
+        // skip
+      }
+      try{
+        localState = JSON.parse(localData)
+      }catch(error){
+        // skip
+      }
+      store.replaceState(Object.assign({}, store.state, sessionState, localState))
+    }
+
     save(store.state, session, local)
     store.subscribe((mutation, state) => {
       save(state, session, local)
     })
   }
 }
+
+export default vuexStorage

@@ -25,18 +25,6 @@ module.exports = webpackMerge(WebpackBaseConfig, {
         enforce: 'post',
         exclude: /node_modules|\.spec\.js$/,
       },
-      {
-        test: /\.ts$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              appendTsSuffixTo: [/\.vue$/],
-            },
-          },
-        ],
-      },
     ],
   },
   plugins: [

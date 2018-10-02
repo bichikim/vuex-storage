@@ -5,16 +5,17 @@
  * mocha, chai, karma-coverage
  * @author Bichi Kim <bichi@live.co.kr>
  */
+
 const webpack = require('./webpack.test.config.js')
 module.exports = function(config) {
   config.set({
-    browsers: ['PhantomJS', 'ChromeWithoutSecurity', 'ChromeHeadlessWithoutSecurity'],
+    browsers: ['ChromeHeadlessWithoutSecurity'],
     frameworks: ['mocha', 'chai'],
     reporters: ['spec', 'coverage', 'remap-coverage'],
     files: [
-      '../node_modules/babel-polyfill/dist/polyfill.js',
+      '../node_modules/@babel/polyfill/dist/polyfill.js',
       {pattern: '../src/**/*.spec.js', watched: false},
-      {pattern: './test/specs/**/*.spec.js', watched: false},
+      {pattern: '../test/specs/**/*.spec.js', watched: false},
     ],
     exclude: [
       '../src/**/*.spec.skip.js',
@@ -23,16 +24,16 @@ module.exports = function(config) {
       '../src/**/*.js': ['webpack', 'sourcemap'],
       '../src/**/*.ts': ['webpack', 'sourcemap'],
       '../test/specs/**/*.js': ['webpack', 'sourcemap'],
-      './test/specs/**/*.ts': ['webpack', 'sourcemap'],
+      '../test/specs/**/*.ts': ['webpack', 'sourcemap'],
     },
     coverageReporter: {
-      type: 'in-memory'
+      type: 'in-memory',
     },
     remapCoverageReporter: {
       'text-summary': null,
       lcovonly: './coverage/lcov.info',
       html: './coverage/html',
-      cobertura: './coverage/cobertura.xml'
+      cobertura: './coverage/cobertura.xml',
     },
     webpack,
     webpackMiddleware: {

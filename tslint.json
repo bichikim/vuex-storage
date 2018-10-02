@@ -2,6 +2,11 @@
   "extends": [
     "tslint:recommended"
   ],
+  "linterOptions": {
+    "exclude": [
+      "declarations"
+    ]
+  },
   "rules": {
     "class-name": true,
     "curly": true,
@@ -26,7 +31,7 @@
     "no-eval": true,
     "no-require-imports": true,
     "no-string-literal": true,
-    "trailing-comma": [true, {
+    "trailing-comma": [false, {
       "multiline": "always",
       "singleline": "never"
     }],
@@ -69,7 +74,7 @@
         "variable-declaration": "onespace"
       }
     ],
-     "max-classes-per-file": [false, 1],
+    "max-classes-per-file": [false, 1],
     "object-literal-sort-keys": false,
     "space-before-function-paren": [true, {
       "anonymous": "never",
