@@ -2,6 +2,7 @@ import {cloneDeep, merge, omit, pick} from 'lodash'
 import {Mutation, Store} from 'vuex'
 import {Plugin} from 'vuex'
 export interface IVuexStorageOptions {
+  isRun?: boolean
   isRestore?: boolean,
   isStrictMode?: boolean,
   session?: IFilterOptions
@@ -35,14 +36,25 @@ export default class VuexStorage<S> {
   readonly mutation: Mutation<S>
   readonly plugin: Plugin<S>
   readonly save: (state: any) => void
+  isRun: boolean
 
   constructor(options: IVuexStorageOptions = {}) {
-    this.key = options.key || 'vuex'
-    this.session = options.session || {}
-    this.local = options.local || {}
-    this.isRestore = options.isRestore || true
-    this.isStrictMode = options.isStrictMode || false
-    this.mutationName = options.mutationName || '__RESTORE_MUTATION'
+    const {
+      isRun = true,
+      key = 'vuex',
+      session = {},
+      local = {},
+      isRestore = true,
+      isStrictMode = false,
+      mutationName = '__RESTORE_MUTATION',
+    } = options
+    this.key = key
+    this.session = session
+    this.local = local
+    this.isRestore = isRestore
+    this.isRun = isRun
+    this.isStrictMode = isStrictMode
+    this.mutationName = mutationName
     this.mutation = function(state: S, payload: any) {
       // eslint-disable-next-line consistent-this
       const that: any = this
@@ -83,7 +95,7 @@ export default class VuexStorage<S> {
     }
 
     this.plugin = (store: Store<S>) => {
-      if(process.server){
+      if(!this.isRun){
         return
       }
       if(window.onNuxtReady){

@@ -148,9 +148,9 @@ describe('vuex-storage', () => {
   })
   describe('nuxt', () => {
     it('should not run in nuxt server', () => {
-      process.server = true
       const vuexStorage = new VuexStorage({
         key,
+        isRun: false,
       })
       store = new Vuex.Store({
         state: {
@@ -173,7 +173,6 @@ describe('vuex-storage', () => {
       expect(window.localStorage.getItem(key)).to.equal('{"test":"test"}')
     })
     it('should run', () => {
-      process.server = false
       let calledOnnNuxtReady = false
       window.onNuxtReady = (fn) => {
         calledOnnNuxtReady = true
@@ -181,6 +180,7 @@ describe('vuex-storage', () => {
       }
       const vuexStorage = new VuexStorage({
         key,
+        isRun: true,
         session: {
           except: [],
         },
