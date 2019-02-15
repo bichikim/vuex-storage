@@ -34,7 +34,7 @@ export default class VuexStorage<S> {
   readonly mutationName: string
   readonly mutation: Mutation<S>
   readonly plugin: Plugin<S>
-  readonly save: (store: Store<S>, state: any) => void
+  readonly save: (state: any) => void
 
   constructor(options: IVuexStorageOptions = {}) {
     this.key = options.key || 'vuex'
@@ -50,12 +50,12 @@ export default class VuexStorage<S> {
         that._vm.$set(state, moduleKey, payload[moduleKey])
       })
     }
-    this.save = (store: Store<S>, state: any) => {
+    this.save = (state: any) => {
       const {sessionStorage, localStorage} = window
       sessionStorage.setItem(this.key,
-        JSON.stringify(storeExceptOrOnly(store.state, this.session.except, this.session.only)))
+        JSON.stringify(storeExceptOrOnly(state, this.session.except, this.session.only)))
       localStorage.setItem(this.key,
-        JSON.stringify(storeExceptOrOnly(store.state, this.local.except, this.local.only)))
+        JSON.stringify(storeExceptOrOnly(state, this.local.except, this.local.only)))
     }
 
     const plugin = (store: Store<S>) => {
@@ -76,9 +76,9 @@ export default class VuexStorage<S> {
         }
       }
 
-      this.save(store, store.state)
+      this.save(store.state)
       store.subscribe((mutation, state) => {
-        this.save(store, state)
+        this.save(state)
       })
     }
 
