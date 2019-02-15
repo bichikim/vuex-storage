@@ -22,6 +22,7 @@ debug.log*
 #yarn.lock
 package-lock.json
 .env
+.npmrc
 
 ## Editor directories and files
 .idea

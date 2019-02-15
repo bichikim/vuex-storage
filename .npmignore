@@ -4,6 +4,7 @@ build/
 config/
 docs/
 .idea/
+.npmrc
 coverage/
 .eslintrc.js
 .babelrc
