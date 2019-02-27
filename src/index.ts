@@ -19,7 +19,8 @@ export interface IFilterOptions {
 }
 
 // saving mutation name
-function storeExceptOrOnly(state: any, except?: string[], only?: string[]): any {
+function storeExceptOrOnly(_state: any, except?: string[], only?: string[]): any {
+  const state = cloneDeep(_state)
   let clonedState: any = {}
   if(except){
     clonedState = omit(state, except)
@@ -95,8 +96,6 @@ export default class VuexStorage<S extends any> {
         const cookiState = cookies.get(key) || {}
 
         let state = merge(sessionState, localState, cookiState)
-
-        console.log(state, cookiState)
 
         if(isStrictMode){
           store.commit(mutationName, state)
