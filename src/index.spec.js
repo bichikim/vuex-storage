@@ -18,6 +18,7 @@ describe('vuex-storage', () => {
   afterEach(() => {
     window.sessionStorage.setItem(key, '{}')
     window.localStorage.setItem(key, '{}')
+    delete window.onNuxtReady
   })
   describe('local', () => {
     it('should init', () => {
@@ -175,8 +176,8 @@ describe('vuex-storage', () => {
       expect(store.state.test).to.equal('testDone')
     })
   })
-  describe('nuxt', () => {
-    it('should not run in nuxt server', () => {
+  describe('supporting nuxt', () => {
+    it('should not run with isRun option', () => {
       const vuexStorage = new VuexStorage({
         key,
         isRun: false,
@@ -184,7 +185,6 @@ describe('vuex-storage', () => {
       store = new Vuex.Store({
         state: {
           test: null,
-          noTest: null,
         },
         mutations: {
           changeTest(state) {
@@ -201,11 +201,14 @@ describe('vuex-storage', () => {
       expect(window.sessionStorage.getItem(key)).to.equal('{"test":"test"}')
       expect(window.localStorage.getItem(key)).to.equal('{"test":"test"}')
     })
-    it('should run', () => {
+    it('should run with onNuxtReady', () => {
       let calledOnnNuxtReady = false
+      // mocking window.onNuxtReady
       window.onNuxtReady = (fn) => {
+        if(!calledOnnNuxtReady){
+          fn()
+        }
         calledOnnNuxtReady = true
-        fn()
       }
       const vuexStorage = new VuexStorage({
         key,
@@ -218,6 +221,7 @@ describe('vuex-storage', () => {
         },
       })
       store = new Vuex.Store({
+        strict: false,
         state: {
           test: null,
         },
@@ -257,7 +261,8 @@ describe('vuex-storage', () => {
       store = new Vuex.Store({
         strict: true,
         state: {
-          test: null,
+          // eslint-disable-next-line no-undefined
+          test: undefined,
         },
         mutations: {
           changeTest(state) {
@@ -285,13 +290,13 @@ describe('vuex-storage', () => {
         key,
         mutationName,
         isStrictMode: true,
+        storageFirst: true,
         session: {
           except: [],
         },
         local: {
           except: [],
         },
-        storageFirst: true,
       })
       store = new Vuex.Store({
         strict: true,

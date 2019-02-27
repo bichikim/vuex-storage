@@ -120,9 +120,11 @@ export default class VuexStorage<S extends any> {
     }
 
     this.plugin = (store: Store<S>) => {
+
       if(!this.isRun){
         return
       }
+
       if(window.onNuxtReady){
         window.onNuxtReady(() => (plugin(store)))
       }else{
