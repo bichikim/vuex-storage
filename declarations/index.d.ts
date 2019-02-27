@@ -8,12 +8,13 @@ export interface IVuexStorageOptions {
     mutationName?: string;
     local?: IFilterOptions;
     key?: string;
+    storageFirst?: boolean;
 }
 export interface IFilterOptions {
     except?: string[];
     only?: string[];
 }
-export default class VuexStorage<S> {
+export default class VuexStorage<S extends any> {
     readonly key: string;
     readonly session: IFilterOptions;
     readonly local: IFilterOptions;
@@ -22,6 +23,7 @@ export default class VuexStorage<S> {
     readonly mutationName: string;
     readonly mutation: Mutation<S>;
     readonly plugin: Plugin<S>;
+    readonly storageFirst: boolean;
     readonly save: (state: any) => void;
     isRun: boolean;
     constructor(options?: IVuexStorageOptions);

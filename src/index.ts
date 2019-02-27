@@ -9,6 +9,7 @@ export interface IVuexStorageOptions {
   mutationName?: string
   local?: IFilterOptions
   key?: string
+  storageFirst?: boolean
 }
 
 export interface IFilterOptions {
@@ -26,7 +27,7 @@ function storeExceptOrOnly(state: any, except?: string[], only?: string[]): any 
   return clonedState
 }
 
-export default class VuexStorage<S> {
+export default class VuexStorage<S extends any> {
   readonly key: string
   readonly session: IFilterOptions
   readonly local: IFilterOptions
@@ -35,6 +36,7 @@ export default class VuexStorage<S> {
   readonly mutationName: string
   readonly mutation: Mutation<S>
   readonly plugin: Plugin<S>
+  readonly storageFirst: boolean
   readonly save: (state: any) => void
   isRun: boolean
 
@@ -47,6 +49,7 @@ export default class VuexStorage<S> {
       isRestore = true,
       isStrictMode = false,
       mutationName = '__RESTORE_MUTATION',
+      storageFirst = false,
     } = options
     this.key = key
     this.session = session
@@ -55,11 +58,26 @@ export default class VuexStorage<S> {
     this.isRun = isRun
     this.isStrictMode = isStrictMode
     this.mutationName = mutationName
+    this.storageFirst = storageFirst
     this.mutation = function(state: S, payload: any) {
       // eslint-disable-next-line consistent-this
       const that: any = this
       Object.keys(payload).forEach((moduleKey: string) => {
-        that._vm.$set(state, moduleKey, payload[moduleKey])
+        let targetState, srcState, storageData
+        targetState = state[moduleKey]
+        srcState = payload[moduleKey]
+        if(typeof targetState === 'object' && targetState !== null){
+          if(!storageFirst){
+            targetState = state[moduleKey]
+            srcState = payload[moduleKey]
+          }
+          storageData = merge(targetState, srcState)
+        }else if(storageFirst && targetState){
+          storageData = targetState
+        }else{
+          storageData = srcState
+        }
+        that._vm.$set(state, moduleKey, storageData)
       })
     }
     this.save = (state: any) => {
@@ -81,10 +99,17 @@ export default class VuexStorage<S> {
         const sessionState = JSON.parse(sessionData)
         const localState = JSON.parse(localData)
 
+        let state = sessionState
+        if(typeof localState === 'object' && typeof sessionState === 'object'){
+          state = merge(sessionState, localState)
+        }else if(typeof localState === 'string' || typeof localState === 'number'){
+          state = localState
+        }
+
         if(this.isStrictMode){
-          store.commit(this.mutationName, sessionState)
+          store.commit(this.mutationName, state)
         }else{
-          store.replaceState(merge(store.state, sessionState, localState))
+          store.replaceState(merge(store.state, state))
         }
       }
 

@@ -45,6 +45,35 @@ describe('vuex-storage', () => {
       expect(store.state.test).to.equal('test')
     })
 
+    // it('should init in the off storage data first option', () => {
+    //   window.localStorage.setItem(key, '{"test":"test", "test2": "test2"}')
+    //   const vuexStorage = new VuexStorage({
+    //     key,
+    //     session: {
+    //       except: [],
+    //     },
+    //     local: {
+    //       only: ['test', 'test2'],
+    //     },
+    //     storageFirst: false,
+    //   })
+    //   store = new Vuex.Store({
+    //     state: {
+    //       test: 'initTest',
+    //       // eslint-disable-next-line no-undefined
+    //       test2: undefined,
+    //     },
+    //     mutations: {
+    //       changeTest(state) {
+    //         state.test = 'testDone'
+    //       },
+    //     },
+    //     plugins: [vuexStorage.plugin],
+    //   })
+    //   expect(store.state.test).to.equal('initTest')
+    //   expect(store.state.test2).to.equal('test2')
+    // })
+
     it('should save changed state', () => {
       const vuexStorage = new VuexStorage({
         key,
@@ -212,7 +241,7 @@ describe('vuex-storage', () => {
     })
   })
   describe('strict mode', () => {
-    it('should run', () => {
+    it('should inti by storage', () => {
       const mutationName = '__MyMutation'
       const vuexStorage = new VuexStorage({
         key,
@@ -240,12 +269,55 @@ describe('vuex-storage', () => {
           vuexStorage.plugin,
         ],
       })
+      expect(store.state.test).to.equal('test')
       expect(window.sessionStorage.getItem(key)).to.equal('{"test":"test"}')
       expect(window.localStorage.getItem(key)).to.equal('{"test":"test"}')
       store.commit('changeTest')
       expect(store.state.test).to.equal('testDone')
       expect(window.sessionStorage.getItem(key)).to.equal('{"test":"testDone"}')
       expect(window.localStorage.getItem(key)).to.equal('{"test":"testDone"}')
+    })
+    it('should inti by storage with storageFirst option', () => {
+      window.sessionStorage.setItem(key, '{"test":"test","test2":"test2"}')
+      window.localStorage.setItem(key, '{"test":"test","test2":"test2"}')
+      const mutationName = '__MyMutation'
+      const vuexStorage = new VuexStorage({
+        key,
+        mutationName,
+        isStrictMode: true,
+        session: {
+          except: [],
+        },
+        local: {
+          except: [],
+        },
+        storageFirst: true,
+      })
+      store = new Vuex.Store({
+        strict: true,
+        state: {
+          test: 'testBase',
+          // eslint-disable-next-line no-undefined
+          test2: undefined,
+        },
+        mutations: {
+          changeTest(state) {
+            state.test = 'testDone'
+          },
+          [mutationName]: vuexStorage.mutation,
+        },
+        plugins: [
+          vuexStorage.plugin,
+        ],
+      })
+      expect(store.state.test).to.equal('testBase')
+      expect(store.state.test2).to.equal('test2')
+      expect(window.sessionStorage.getItem(key)).to.equal('{"test":"testBase","test2":"test2"}')
+      expect(window.localStorage.getItem(key)).to.equal('{"test":"testBase","test2":"test2"}')
+      store.commit('changeTest')
+      expect(store.state.test).to.equal('testDone')
+      expect(window.sessionStorage.getItem(key)).to.equal('{"test":"testDone","test2":"test2"}')
+      expect(window.localStorage.getItem(key)).to.equal('{"test":"testDone","test2":"test2"}')
     })
   })
 })
