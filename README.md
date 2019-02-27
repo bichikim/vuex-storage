@@ -92,6 +92,10 @@ const vuexStorage = new VuexStorage({
     expect: [],
     only: [],
   },
+  cookie: {
+    except: [],
+    only: [],
+  }
 })
 const store = new Vuex.Store({
   strict: true,
@@ -120,13 +124,17 @@ new VuexStorage({
     // only where in list below to save
     only: ['auth'],
     // except where in list below to save
-    except: [],
+    except: ['auth.access-token'],
   },
   session: {
     // only where in list below to save
     only: [],
     // except where in list below to save
     except: ['auth'],
+  },
+  cookie: {
+    except: [],
+    only: ['auth.access-token'],
   }
 })
 ```

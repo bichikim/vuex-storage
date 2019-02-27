@@ -2,6 +2,8 @@
 import VuexStorage from './'
 import Vuex from 'vuex'
 import Vue from 'vue'
+import Cookies from 'universal-cookie'
+const cookies = new Cookies()
 describe('vuex-storage', () => {
   if(!window.process){
     window.process = {}
@@ -18,6 +20,7 @@ describe('vuex-storage', () => {
   afterEach(() => {
     window.sessionStorage.setItem(key, '{}')
     window.localStorage.setItem(key, '{}')
+    cookies.remove(key, {path: '/'})
     delete window.onNuxtReady
   })
   describe('local', () => {
@@ -207,6 +210,56 @@ describe('vuex-storage', () => {
       })
       store.commit('changeTest')
       expect(window.sessionStorage.getItem(key)).to.equal('{"noTest":"testDone"}')
+      expect(store.state.test).to.equal('testDone')
+    })
+  })
+  describe('cookie', () => {
+    it('should save changed state by only', () => {
+      const vuexStorage = new VuexStorage({
+        key,
+        cookie: {
+          only: ['test'],
+        },
+      })
+      store = new Vuex.Store({
+        state: {
+          test: null,
+          noTest: null,
+        },
+        mutations: {
+          changeTest(state) {
+            state.test = 'testDone'
+            state.noTest = 'testDone'
+          },
+        },
+        plugins: [vuexStorage.plugin],
+      })
+      store.commit('changeTest')
+      expect(cookies.get(key)).to.deep.equal({test: 'testDone'})
+      expect(store.state.test).to.equal('testDone')
+    })
+    it('should save changed state by except', () => {
+      const vuexStorage = new VuexStorage({
+        key,
+        cookie: {
+          except: ['test'],
+        },
+      })
+      store = new Vuex.Store({
+        state: {
+          test: null,
+          noTest: null,
+        },
+        mutations: {
+          changeTest(state) {
+            state.test = 'testDone'
+            state.noTest = 'testDone'
+          },
+        },
+        plugins: [vuexStorage.plugin],
+      })
+      store.commit('changeTest')
+      expect(cookies.get(key)).to.deep.equal({noTest: 'testDone'})
       expect(store.state.test).to.equal('testDone')
     })
   })
