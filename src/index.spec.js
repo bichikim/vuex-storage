@@ -99,6 +99,40 @@ describe('vuex-storage', () => {
       expect(window.localStorage.getItem(key)).to.equal('{"test":"testDone"}')
       expect(store.state.test).to.equal('testDone')
     })
+    it('should save with deep setting', () => {
+      window.sessionStorage.setItem(key, '{}')
+      window.localStorage.setItem(key, '{}')
+      const vuexStorage = new VuexStorage({
+        key,
+        local: {
+          only: ['test.foo'],
+        },
+      })
+      const store = new Vuex.Store({
+        state: {
+          noTest: null,
+        },
+        modules: {
+          test: {
+            state: {
+              foo: 'foo',
+              bar: 'bar',
+            },
+          },
+        },
+        mutations: {
+          changeTest(state) {
+            state.test.foo = 'testDone'
+            state.noTest = 'testDone'
+          },
+        },
+        plugins: [vuexStorage.plugin],
+      })
+      store.commit('changeTest')
+      expect(window.localStorage.getItem(key)).to.equal('{"test":{"foo":"testDone"}}')
+      expect(store.state.test.foo).to.equal('testDone')
+      expect(store.state.noTest).to.equal('testDone')
+    })
     it('should save changed state by an except option', () => {
       const vuexStorage = new VuexStorage({
         key,

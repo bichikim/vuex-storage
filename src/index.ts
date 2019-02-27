@@ -11,18 +11,19 @@ export interface IVuexStorageOptions {
   key?: string
   storageFirst?: boolean
 }
-
 export interface IFilterOptions {
   except?: string[],
   only?: string[],
 }
+
 // saving mutation name
 function storeExceptOrOnly(state: any, except?: string[], only?: string[]): any {
   let clonedState: any = {}
   if(except){
-    clonedState = omit(cloneDeep(state), except)
-  }else if(only){
-    clonedState = pick(cloneDeep(state), only)
+    clonedState = omit(state, except)
+  }
+  if(only){
+    clonedState = {...clonedState, ...pick(state, only)}
   }
   return clonedState
 }
