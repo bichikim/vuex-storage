@@ -46,34 +46,34 @@ describe('vuex-storage', () => {
       expect(store.state.test).to.equal('test')
     })
 
-    // it('should init in the off storage data first option', () => {
-    //   window.localStorage.setItem(key, '{"test":"test", "test2": "test2"}')
-    //   const vuexStorage = new VuexStorage({
-    //     key,
-    //     session: {
-    //       except: [],
-    //     },
-    //     local: {
-    //       only: ['test', 'test2'],
-    //     },
-    //     storageFirst: false,
-    //   })
-    //   store = new Vuex.Store({
-    //     state: {
-    //       test: 'initTest',
-    //       // eslint-disable-next-line no-undefined
-    //       test2: undefined,
-    //     },
-    //     mutations: {
-    //       changeTest(state) {
-    //         state.test = 'testDone'
-    //       },
-    //     },
-    //     plugins: [vuexStorage.plugin],
-    //   })
-    //   expect(store.state.test).to.equal('initTest')
-    //   expect(store.state.test2).to.equal('test2')
-    // })
+    it('should init in the off storage data first option', () => {
+      window.localStorage.setItem(key, '{"test":"test", "test2": "test2"}')
+      const vuexStorage = new VuexStorage({
+        key,
+        session: {
+          except: [],
+        },
+        local: {
+          only: ['test', 'test2'],
+        },
+        storageFirst: true,
+      })
+      store = new Vuex.Store({
+        state: {
+          test: 'initTest',
+          // eslint-disable-next-line no-undefined
+          test2: undefined,
+        },
+        mutations: {
+          changeTest(state) {
+            state.test = 'testDone'
+          },
+        },
+        plugins: [vuexStorage.plugin],
+      })
+      expect(store.state.test).to.equal('initTest')
+      expect(store.state.test2).to.equal('test2')
+    })
 
     it('should save changed state', () => {
       const vuexStorage = new VuexStorage({

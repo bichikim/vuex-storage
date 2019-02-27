@@ -109,7 +109,13 @@ export default class VuexStorage<S extends any> {
         if(this.isStrictMode){
           store.commit(this.mutationName, state)
         }else{
-          store.replaceState(merge(store.state, state))
+          let data
+          if(storageFirst){
+            data = merge(state, store.state)
+          }else{
+            data = merge(store.state, state)
+          }
+          store.replaceState(data)
         }
       }
 
