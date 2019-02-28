@@ -40,14 +40,14 @@ export default class VuexStorage<S extends any> {
 
   constructor(options: IVuexStorageOptions = {}) {
     const {
-      cookie = {},
+      cookie,
       isRestore = true,
       isRun = true,
       isStrictMode = false,
       key = 'vuex',
-      local = {},
+      local,
       mutationName = '__RESTORE_MUTATION',
-      session = {},
+      session,
       storageFirst = false,
     } = options
     const cookies = new Cookies()
@@ -76,11 +76,17 @@ export default class VuexStorage<S extends any> {
 
     this.save = (state: any) => {
       const {sessionStorage, localStorage} = window
-      sessionStorage.setItem(key,
-        JSON.stringify(storeExceptOrOnly(state, session.except, session.only)))
-      localStorage.setItem(key,
-        JSON.stringify(storeExceptOrOnly(state, local.except, local.only)))
-      cookies.set(key, storeExceptOrOnly(state, cookie.except, cookie.only), {path: '/'})
+      if(session){
+        sessionStorage.setItem(key,
+          JSON.stringify(storeExceptOrOnly(state, session.except, session.only)))
+      }
+      if(local){
+        localStorage.setItem(key,
+          JSON.stringify(storeExceptOrOnly(state, local.except, local.only)))
+      }
+      if(cookies){
+        cookies.set(key, storeExceptOrOnly(state, cookie.except, cookie.only), {path: '/'})
+      }
     }
 
     const plugin = (store: Store<S>) => {
