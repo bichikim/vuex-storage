@@ -99,9 +99,9 @@ export default class VuexStorage<S extends any> {
 
         const sessionState = JSON.parse(sessionData)
         const localState = JSON.parse(localData)
-        const cookiState = cookies.get(key) || {}
+        const cookieState = cookies.get(key) || {}
 
-        let state = merge(sessionState, localState, cookiState)
+        let state = merge(sessionState, localState, cookieState)
 
         if(isStrictMode){
           store.commit(mutationName, state)
