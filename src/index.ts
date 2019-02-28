@@ -84,7 +84,7 @@ export default class VuexStorage<S extends any> {
         localStorage.setItem(key,
           JSON.stringify(storeExceptOrOnly(state, local.except, local.only)))
       }
-      if(cookies){
+      if(cookie){
         cookies.set(key, storeExceptOrOnly(state, cookie.except, cookie.only), {path: '/'})
       }
     }
