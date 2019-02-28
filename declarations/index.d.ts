@@ -19,5 +19,6 @@ export default class VuexStorage<S extends any> {
     readonly mutation: Mutation<S>;
     readonly plugin: Plugin<S>;
     readonly save: (state: any) => void;
+    readonly clear: () => void;
     constructor(options?: IVuexStorageOptions);
 }

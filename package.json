@@ -10,7 +10,8 @@
     "build": "node build",
     "doc": "typedoc -out ./docs ./src --media ./media",
     "test": "npm run test:unit",
-    "test:unit": "karma start config/karma.config.js --browsers=PhantomJS --single-run"
+    "test:unit": "karma start config/karma.config.js --browsers=PhantomJS --single-run",
+    "preversion": "npm run test && npm run build"
   },
   "repository": {
     "type": "git",
