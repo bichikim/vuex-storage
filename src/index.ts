@@ -37,6 +37,7 @@ export default class VuexStorage<S extends any> {
   readonly mutation: Mutation<S>
   readonly plugin: Plugin<S>
   readonly save: (state: any) => void
+  readonly clear: () => void
 
   constructor(options: IVuexStorageOptions = {}) {
     const {
@@ -74,8 +75,16 @@ export default class VuexStorage<S extends any> {
       })
     }
 
+    this.clear = () => {
+      const {sessionStorage, localStorage} = window
+      sessionStorage.setItem(key, '{}')
+      localStorage.setItem(key, '{}')
+      cookies.set(key, {}, {path: '/'})
+    }
+
     this.save = (state: any) => {
       const {sessionStorage, localStorage} = window
+      this.clear()
       if(session){
         sessionStorage.setItem(key,
           JSON.stringify(storeExceptOrOnly(state, session.except, session.only)))
