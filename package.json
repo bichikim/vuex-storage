@@ -1,6 +1,6 @@
 {
   "name": "vuex-storage",
-  "version": "1.1.2-alpha.3",
+  "version": "1.2.0",
   "description": "vuex-storage",
   "author": "bichi",
   "main": "dist/app.js",
@@ -18,7 +18,7 @@
     "url": "git+https://github.com/bichikim/vuex-storage.git"
   },
   "keywords": [
-    "typescript"
+    "typescript" ,"vuex", "cookie", "local-storage", "sessoin-storage"
   ],
   "bugs": {
     "url": "https://github.com/bichikim/vuex-storage/issues"
