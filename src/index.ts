@@ -34,6 +34,7 @@ function storeExceptOrOnly(_state: any, except?: string[], only?: string[]): any
 }
 
 export default class VuexStorage<S extends any> {
+  readonly mutationName: string
   readonly mutation: Mutation<S>
   readonly plugin: Plugin<S>
   readonly save: (state: any) => void
@@ -51,6 +52,7 @@ export default class VuexStorage<S extends any> {
       session,
       storageFirst = false,
     } = options
+    this.mutationName = mutationName
     const cookies = new Cookies()
 
     this.mutation = function(state: S, payload: any) {
