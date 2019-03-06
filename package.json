@@ -1,6 +1,6 @@
 {
   "name": "vuex-storage",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "vuex-storage",
   "author": "bichi",
   "main": "dist/app.js",
@@ -11,6 +11,7 @@
     "doc": "typedoc -out ./docs ./src --media ./media",
     "test": "npm run test:unit",
     "test:unit": "karma start config/karma.config.js --browsers=PhantomJS --single-run",
+    "test:unit-node": "mocha src/**/*.test.ts",
     "preversion": "npm run test && npm run build"
   },
   "repository": {
@@ -18,7 +19,11 @@
     "url": "git+https://github.com/bichikim/vuex-storage.git"
   },
   "keywords": [
-    "typescript" ,"vuex", "cookie", "local-storage", "sessoin-storage"
+    "typescript",
+    "vuex",
+    "cookie",
+    "local-storage",
+    "sessoin-storage"
   ],
   "bugs": {
     "url": "https://github.com/bichikim/vuex-storage/issues"
@@ -59,12 +64,15 @@
     "tslint": "^5.12.1",
     "typedoc": "^0.14.2",
     "typescript": "^3.3.3",
+    "ts-node": "^8.0.2",
+    "tsconfig-paths": "^3.8.0",
     "typescript-eslint-parser": "^22.0.0",
     "webpack": "^4.29.5",
     "webpack-merge": "^4.1.4",
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
+    "cookie": "^0.3.1",
     "lodash": "^4.17.5",
     "universal-cookie": "^3.0.7",
     "vue": "^2.5.16",

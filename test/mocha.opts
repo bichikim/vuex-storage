@@ -1,0 +1,4 @@
+--require test/ts-node-config
+--require ts-node/register
+--require tsconfig-paths/register
+

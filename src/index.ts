@@ -1,10 +1,17 @@
 import {cloneDeep, merge, omit, pick} from 'lodash'
-import Cookies from 'universal-cookie'
 import {Mutation, Store} from 'vuex'
 import {Plugin} from 'vuex'
+import Cookies from './cookie'
+interface INuxtContext {
+  req: Request,
+  res: Response,
+}
 export interface IVuexStorageOptions {
   cookie?: IFilterOptions
   isRestore?: boolean
+  /**
+   * @deprecated
+   */
   isRun?: boolean
   isStrictMode?: boolean
   key?: string
@@ -37,14 +44,16 @@ export default class VuexStorage<S extends any> {
   readonly mutationName: string
   readonly mutation: Mutation<S>
   readonly plugin: Plugin<S>
-  readonly save: (state: any) => void
+  readonly restore: (store: Store<S>, context?: INuxtContext) => void
+  readonly save: (state: any, context?: INuxtContext) => void
   readonly clear: () => void
+  private _cookies?: Cookies
 
   constructor(options: IVuexStorageOptions = {}) {
     const {
       cookie,
       isRestore = true,
-      isRun = true,
+      isRun,
       isStrictMode = false,
       key = 'vuex',
       local,
@@ -52,8 +61,11 @@ export default class VuexStorage<S extends any> {
       session,
       storageFirst = false,
     } = options
+    if(isRun){
+      console.warn('please do not use the isRun option')
+    }
+
     this.mutationName = mutationName
-    const cookies = new Cookies()
 
     this.mutation = function(state: S, payload: any) {
       // eslint-disable-next-line consistent-this
@@ -78,15 +90,53 @@ export default class VuexStorage<S extends any> {
     }
 
     this.clear = () => {
-      const {sessionStorage, localStorage} = window
-      sessionStorage.setItem(key, '{}')
-      localStorage.setItem(key, '{}')
-      cookies.set(key, {}, {path: '/'})
+      if(window){
+        const {sessionStorage, localStorage} = window
+        sessionStorage.setItem(key, '{}')
+        localStorage.setItem(key, '{}')
+      }
+      if(this._cookies){
+        this._cookies.set(key, {}, {path: '/'})
+      }
     }
 
-    this.save = (state: any) => {
-      const {sessionStorage, localStorage} = window
+    this.restore = (store: Store<S>, context?: INuxtContext) => {
+      const cookieState = this._cookies ? this._cookies.get(key) : {}
+      let sessionState = {}
+      let localState = {}
+      if(window){
+        const {sessionStorage, localStorage} = window
+        const sessionData = sessionStorage.getItem(key) || '{}'
+        const localData = localStorage.getItem(key) || '{}'
+        sessionState = JSON.parse(sessionData)
+        localState = JSON.parse(localData)
+      }
+
+      let state = merge(sessionState, localState, cookieState)
+
+      if(isStrictMode){
+        store.commit(mutationName, state)
+      }else{
+        let data
+        if(storageFirst){
+          data = merge(state, store.state)
+        }else{
+          data = merge(store.state, state)
+        }
+        store.replaceState(data)
+      }
+    }
+
+    this.save = (state: any, context?: INuxtContext) => {
       this.clear()
+      if(cookie && this._cookies){
+        this._cookies.set(key, storeExceptOrOnly(state, cookie.except, cookie.only), {path: '/'})
+      }
+
+      if(!window){
+        return
+      }
+      const {sessionStorage, localStorage} = window
       if(session){
         sessionStorage.setItem(key,
           JSON.stringify(storeExceptOrOnly(state, session.except, session.only)))
@@ -95,55 +145,28 @@ export default class VuexStorage<S extends any> {
         localStorage.setItem(key,
           JSON.stringify(storeExceptOrOnly(state, local.except, local.only)))
       }
-      if(cookie){
-        cookies.set(key, storeExceptOrOnly(state, cookie.except, cookie.only), {path: '/'})
-      }
     }
 
-    const plugin = (store: Store<S>) => {
-      const {sessionStorage, localStorage} = window
+    const plugin = (store: Store<S>, context?: INuxtContext) => {
+      this._cookies = new Cookies(context)
       // saving store
 
       if(isRestore){
-        const sessionData = sessionStorage.getItem(key) || '{}'
-        const localData = localStorage.getItem(key) || '{}'
-
-        const sessionState = JSON.parse(sessionData)
-        const localState = JSON.parse(localData)
-        const cookieState = cookies.get(key) || {}
-
-        let state = merge(sessionState, localState, cookieState)
-
-        if(isStrictMode){
-          store.commit(mutationName, state)
-        }else{
-          let data
-          if(storageFirst){
-            data = merge(state, store.state)
-          }else{
-            data = merge(store.state, state)
-          }
-          store.replaceState(data)
-        }
+        this.restore(store, context)
       }
 
-      this.save(store.state)
+      this.save(store.state, context)
       store.subscribe((mutation, state) => {
-        this.save(state)
+        this.save(state, context)
       })
     }
 
-    this.plugin = (store: Store<S>) => {
-
-      if(!isRun){
+    this.plugin = (store: Store<S>, context?: INuxtContext) => {
+      if(window && window.onNuxtReady){
+        window.onNuxtReady(() => (plugin(store)))
         return
       }
-
-      if(window.onNuxtReady){
-        window.onNuxtReady(() => (plugin(store)))
-      }else{
-        plugin(store)
-      }
+      plugin(store, context)
     }
   }
 }
