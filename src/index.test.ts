@@ -9,8 +9,14 @@ describe('vuex-storage', () => {
     Vue.use(Vuex)
   })
   it('should nuxtServerInit', async () => {
-    const vuexStorage = new VuexStorage<any>()
-    const key = 'key'
+
+    const key = 'vuex'
+    const vuexStorage = new VuexStorage<any>({
+      key,
+      cookie: {
+        only: ['test'],
+      },
+    })
     const req = createRequest({
       path: '/',
       method: 'GET',
