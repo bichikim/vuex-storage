@@ -15,6 +15,8 @@ describe('cookie in browser', () => {
   it('should get', () => {
     const result = cookie.get('test')
     const result1 = cookie.get('test1')
+    console.log(cookie._cookies)
+    console.log(document.cookie)
     expect(result).to.deep.equal({test: 'test'})
     expect(result1).to.deep.equal({test1: 'test1'})
   })

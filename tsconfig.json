@@ -11,6 +11,7 @@
     "noEmitHelpers": false,
     "noImplicitAny": true,
     "allowJs": false,
+    "esModuleInterop": true,
     "moduleResolution": "node",
     "declaration": true,
     "declarationDir": "declarations",
@@ -23,11 +24,6 @@
   "include": [
     "src/**/*.ts",
     "types/**/*.d.ts"
-  ],
-  "exclude": [
-    ".keep",
-    ".templates",
-    "node_modules"
   ],
   "compileOnSave": false
 }

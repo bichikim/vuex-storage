@@ -1,11 +1,17 @@
+import {Request, Response} from 'express'
 import {cloneDeep, merge, omit, pick} from 'lodash'
-import {Mutation, Store} from 'vuex'
+import {ActionContext, Mutation, Store} from 'vuex'
 import {Plugin} from 'vuex'
 import Cookies from './cookie'
 interface INuxtContext {
   req: Request,
   res: Response,
 }
+
+const isClient = (): boolean => {
+  return typeof document === 'object'
+}
+
 export interface IVuexStorageOptions {
   cookie?: IFilterOptions
   isRestore?: boolean
@@ -47,7 +53,8 @@ export default class VuexStorage<S extends any> {
   readonly restore: (store: Store<S>, context?: INuxtContext) => void
   readonly save: (state: any, context?: INuxtContext) => void
   readonly clear: () => void
-  private _cookies?: Cookies
+  readonly nuxtServerInit: (actionContext: ActionContext<S, S>, nuxtContext: INuxtContext) => void
+  private _store: Store<S>
 
   constructor(options: IVuexStorageOptions = {}) {
     const {
@@ -89,22 +96,22 @@ export default class VuexStorage<S extends any> {
       })
     }
 
-    this.clear = () => {
-      if(window){
+    this.clear = (context?: INuxtContext) => {
+      if(isClient()){
         const {sessionStorage, localStorage} = window
         sessionStorage.setItem(key, '{}')
         localStorage.setItem(key, '{}')
       }
-      if(this._cookies){
-        this._cookies.set(key, {}, {path: '/'})
-      }
+      const cookies = new Cookies(context)
+      cookies.set(key, {}, {path: '/'})
     }
 
     this.restore = (store: Store<S>, context?: INuxtContext) => {
-      const cookieState = this._cookies ? this._cookies.get(key) : {}
+      const cookies = new Cookies(context)
+      const cookieState = cookies.get(key)
       let sessionState = {}
       let localState = {}
-      if(window){
+      if(isClient()){
         const {sessionStorage, localStorage} = window
         const sessionData = sessionStorage.getItem(key) || '{}'
         const localData = localStorage.getItem(key) || '{}'
@@ -129,11 +136,12 @@ export default class VuexStorage<S extends any> {
 
     this.save = (state: any, context?: INuxtContext) => {
       this.clear()
-      if(cookie && this._cookies){
-        this._cookies.set(key, storeExceptOrOnly(state, cookie.except, cookie.only), {path: '/'})
+      const cookies = new Cookies(context)
+      if(cookie && cookies){
+        cookies.set(key, storeExceptOrOnly(state, cookie.except, cookie.only), {path: '/'})
       }
 
-      if(!window){
+      if(!isClient()){
         return
       }
       const {sessionStorage, localStorage} = window
@@ -147,26 +155,34 @@ export default class VuexStorage<S extends any> {
       }
     }
 
-    const plugin = (store: Store<S>, context?: INuxtContext) => {
-      this._cookies = new Cookies(context)
-      // saving store
-
+    const plugin = (store: Store<S>) => {
+      if(this._store){
+        console.warn('plugin install twice')
+      }
+      this._store = store
       if(isRestore){
-        this.restore(store, context)
+        this.restore(store)
       }
 
-      this.save(store.state, context)
+      this.save(store.state)
       store.subscribe((mutation, state) => {
-        this.save(state, context)
+        this.save(state)
       })
     }
 
-    this.plugin = (store: Store<S>, context?: INuxtContext) => {
-      if(window && window.onNuxtReady){
+    this.nuxtServerInit = (actionContext: ActionContext<S, S>, nuxtContext: INuxtContext) => {
+      if(isRestore){
+        this.restore(this._store, nuxtContext)
+      }
+      this.save(actionContext.state)
+    }
+
+    this.plugin = (store: Store<S>) => {
+      if(isClient() && window.onNuxtReady){
         window.onNuxtReady(() => (plugin(store)))
         return
       }
-      plugin(store, context)
+      plugin(store)
     }
   }
 }
