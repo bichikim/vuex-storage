@@ -1,3 +1,4 @@
+/* tslint:disable:no-require-imports variable-name */
 const WebpackBaseConfig = require('./webpack.base.config')
 const webpackMerge = require('webpack-merge')
 const packageJson = require('../package.json')

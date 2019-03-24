@@ -1,6 +1,6 @@
 {
   "name": "vuex-storage",
-  "version": "1.2.1",
+  "version": "1.2.1-alpha.1",
   "description": "vuex-storage",
   "author": "bichi",
   "main": "dist/app.js",
@@ -9,7 +9,7 @@
   "scripts": {
     "build": "node build",
     "doc": "typedoc -out ./docs ./src --media ./media",
-    "test": "npm run test:unit && npm run test:unit-node",
+    "test": "npm run test:unit",
     "lint": "eslint \"src/\"",
     "test:unit": "karma start config/karma.config.js --browsers=PhantomJS --single-run",
     "test:unit-node": "mocha src/**/*.test.ts",

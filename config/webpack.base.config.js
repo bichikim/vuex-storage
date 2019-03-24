@@ -1,7 +1,8 @@
+/* tslint:disable:no-require-imports */
 const path = require('path')
 const formatter = require('eslint-friendly-formatter')
 
-const resolve = function(dir) {
+const resolve = (dir) => {
   return path.join(__dirname, '..', dir)
 }
 // noinspection JSUnusedGlobalSymbols

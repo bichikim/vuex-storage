@@ -1,29 +1,34 @@
 import value from '*.json'
 import * as cookie from 'cookie'
 import {Request, Response} from 'express'
+import {merge} from 'lodash'
 interface ICookieOptions {
   req?: Request
   res?: Response
 }
 const SET_COOKIE = 'set-cookie'
 
+export {CookieSerializeOptions} from 'cookie'
+
 export default class Cookies {
   private _res?: Response
   private _req?: Request
   private _isNuxt: boolean
   private _cookies: {[key: string]: any}
+  private _isClient: boolean
   private _init: boolean = false
-  constructor(options: ICookieOptions = {}) {
+  constructor(options: ICookieOptions = {}, isClient: boolean = true) {
     const {req, res} = options
     this._req = req
     this._res = res
+    this._isClient = isClient
     this._updateCookie()
     this._init = true
   }
 
   // eslint-disable-next-line class-methods-use-this
   get isClient(): boolean {
-    return typeof document === 'object'
+    return this._isClient
   }
 
   get(name: string, options?: cookie.CookieSerializeOptions) {
@@ -55,29 +60,21 @@ export default class Cookies {
       this._cookies = cookie.parse(document.cookie)
       return
     }
-    const {_res} = this
-    const _cookie = _res && _res.getHeader(SET_COOKIE)
-    if(_cookie){
-      this._cookies = cookie.parse(_cookie.toString())
-      return
-    }
-    if(this._init){
-      return
-    }
+    this._cookies = {}
     const {_req} = this
     if(_req && _req.headers){
       let _cookie = _req.headers.cookie || _req.cookies
-      if(!_cookie){
-        return
-      }
       if(typeof _cookie === 'object'){
         this._cookies = _cookie
-        return
+      }else{
+        this._cookies = cookie.parse(_cookie)
       }
-      this._cookies = cookie.parse(_cookie)
-      return
     }
-    this._cookies = {}
+    const {_res} = this
+    const _cookie = _res && _res.getHeader(SET_COOKIE)
+    if(_cookie){
+      this._cookies = merge(this._cookies, cookie.parse(_cookie.toString()))
+    }
   }
 
   private _saveCookie(name: string, value?: string, options?: cookie.CookieSerializeOptions) {
