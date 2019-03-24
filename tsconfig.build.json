@@ -1,35 +1,16 @@
 {
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "esnext",
-    "target": "esnext",
-    "lib": [
-      "dom",
-      "esnext"
-    ],
-    "noEmitHelpers": false,
-    "noImplicitAny": true,
-    "allowJs": true,
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["./src/*"],
-      "~/*": ["./lib/*"],
-      "@@/*": ["./*"],
-      "~~/*": ["./*"]
-    }
+    "module": "umd",
+    "target": "es5",
+    "outDir": "dist"
   },
   "include": [
     "src/**/*.ts",
     "types/**/*.d.ts"
   ],
   "exclude": [
-    ".keep",
-    ".templates",
-    "node_modules"
-  ],
-  "compileOnSave": false
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts"
+  ]
 }
