@@ -1,4 +1,3 @@
-import value from '*.json'
 import * as cookie from 'cookie'
 import {Request, Response} from 'express'
 import {merge} from 'lodash'
@@ -13,9 +12,8 @@ export {CookieSerializeOptions} from 'cookie'
 export default class Cookies {
   private _res?: Response
   private _req?: Request
-  private _isNuxt: boolean
   private _cookies: {[key: string]: any}
-  private _isClient: boolean
+  private readonly _isClient: boolean
   private _init: boolean = false
   constructor(options: ICookieOptions = {}, isClient: boolean = true) {
     const {req, res} = options
@@ -31,8 +29,8 @@ export default class Cookies {
     return this._isClient
   }
 
-  get(name: string, options?: cookie.CookieSerializeOptions) {
-    this._updateCookie()
+  get(name: string, options?: cookie.CookieParseOptions) {
+    this._updateCookie(options)
     const data = this._cookies[name]
     try{
       return JSON.parse(data)
@@ -43,7 +41,7 @@ export default class Cookies {
 
   remove(name: string, options?: cookie.CookieSerializeOptions) {
     delete this._cookies[name]
-    this._saveCookie(name, '', options)
+    this._saveCookie(name, undefined, options)
   }
 
   set(name: string, value: object | string, options?: cookie.CookieSerializeOptions) {
@@ -55,50 +53,44 @@ export default class Cookies {
     this._saveCookie(name, _value, options)
   }
 
-  private _updateCookie() {
+  private _updateCookie(options?: cookie.CookieParseOptions) {
     if(this.isClient){
-      this._cookies = cookie.parse(document.cookie)
+      this._cookies = cookie.parse(document.cookie, options)
       return
     }
     this._cookies = {}
     const {_req} = this
-    if(_req && _req.headers){
-      let _cookie = _req.headers.cookie || _req.cookies
+    if(_req && (_req.cookies || _req.headers)){
+      let _cookie =  _req.cookies || _req.headers.cookie
       if(typeof _cookie === 'object'){
-        this._cookies = _cookie
+        this._cookies = {..._cookie}
       }else{
-        this._cookies = cookie.parse(_cookie)
+        this._cookies = cookie.parse(_cookie, options)
       }
     }
     const {_res} = this
     const _cookie = _res && _res.getHeader(SET_COOKIE)
     if(_cookie){
-      this._cookies = merge(this._cookies, cookie.parse(_cookie.toString()))
+      this._cookies = merge(this._cookies, cookie.parse(_cookie.toString(), options))
     }
   }
 
-  private _saveCookie(name: string, value?: string, options?: cookie.CookieSerializeOptions) {
-    const cookieData = cookie.serialize(name, value || '', options)
+  private _saveCookie(name: string, value: string = '', options?: cookie.CookieSerializeOptions) {
     if(this.isClient){
-      document.cookie = cookieData
+      document.cookie = cookie.serialize(name, value, options)
       return
     }
-    const {_req, _res} = this
+    const {_res} = this
     if(_res){
       const regex = new RegExp(`^${name}=`)
-      const rawCookie = _res.getHeader(SET_COOKIE)
-      let cookies: string[] = []
-      if(rawCookie){
-        rawCookie.toString().split(';')
-          .forEach((value: string) => {
-            if(!regex.test(value)){
-              cookies.push(value)
-            }
-          })
-      }
-      if(value){
-        cookies.push(cookieData)
-      }
+      const rawCookie = _res.getHeader(SET_COOKIE) || ''
+      const cookies: string[] = rawCookie
+        .toString()
+        .split(';')
+        .filter((value) => {
+          return !regex.test(value)
+        })
+      cookies.push(cookie.serialize(name, value, options))
       _res.setHeader(SET_COOKIE, cookies.join('; '))
     }
   }
