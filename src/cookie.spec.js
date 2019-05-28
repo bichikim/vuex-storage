@@ -119,5 +119,13 @@ describe('cookie', function test() {
       expect(cookieModule.parse(resCookie).test).to.equal('')
       expect(result).to.equal('')
     })
+    it('should set', function test() {
+      const {cookie} = that
+      const test1Data = {test1: 'test1'}
+      cookie.set('test1', test1Data)
+      const result = cookie.get('test1')
+      expect(cookieModule.parse(resCookie).test1).to.deep.equal(test1Data)
+      expect(result).to.deep.equal(test1Data)
+    })
   })
 })
