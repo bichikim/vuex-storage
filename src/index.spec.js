@@ -471,24 +471,27 @@ describe('vuex-storage', () => {
     })
   })
   describe('nuxtServerInit', () => {
-    it('should init store', async function test() {
+    const that = {}
+    let resCookie = serialize('other', JSON.stringify({test: 'test'}))
+    beforeEach(() => {
       cookies.set(key, {}, {path: '/'})
       process.server = true
-      const cookie = {
+      that.cookie = {
         cookieTest: 'test',
         deepCookieTest: {
           foo: 'foo',
           bar: 'bar',
-        }}
-      const req = {
+        },
+      }
+      that.req = {
         path: '/',
         method: 'GET',
         headers: {
           cookie: serialize(key, JSON.stringify({...cookie})),
         },
       }
-      const resCookie = serialize('other', JSON.stringify({test: 'test'}))
-      const res = {
+
+      that.res = {
         getHeader() {
           return resCookie
         },
@@ -502,6 +505,9 @@ describe('vuex-storage', () => {
           ].join('; ')))
         },
       }
+    })
+    it('should init store', async function test() {
+      const {req, res} = that
       const vuexStorage = new VuexStorage({
         ...vuexStorageOptions,
         clientSide: false,
