@@ -124,7 +124,7 @@ describe('cookie', function test() {
       const test1Data = {test1: 'test1'}
       cookie.set('test1', test1Data)
       const result = cookie.get('test1')
-      expect(cookieModule.parse(resCookie).test1).to.deep.equal(test1Data)
+      expect(JSON.parse(cookieModule.parse(resCookie).test1)).to.deep.equal(test1Data)
       expect(result).to.deep.equal(test1Data)
     })
   })

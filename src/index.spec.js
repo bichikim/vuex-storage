@@ -122,6 +122,18 @@ describe('vuex-storage', () => {
       }
       expect(twice).to.throw()
     })
+    it('should run with clientSide function option ', function test() {
+      const vuexStorage = new VuexStorage({
+        ...vuexStorageOptions,
+        clientSide: () => (true),
+      })
+      new Vuex.Store({
+        ...cloneDeep(state),
+        plugins: [
+          vuexStorage.plugin,
+        ],
+      })
+    })
   })
   describe('restore', () => {
     it('should restore for local, session & cookie', function test() {
