@@ -102,8 +102,8 @@ describe('vuex-storage', () => {
     }, {path: '/'})
   })
   afterEach(() => {
-    window.sessionStorage.setItem(key, '{}')
-    window.localStorage.setItem(key, '{}')
+    window.sessionStorage.clear()
+    window.localStorage.clear()
     cookies.remove(key, {path: '/'})
     delete window.onNuxtReady
     delete process.server
