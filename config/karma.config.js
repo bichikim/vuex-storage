@@ -1,49 +1,20 @@
 /**
  * karma settings
- * This test must have packages below
- * karma, karma-chai, karma-sourcemap-loader, karma-spec-reporter, karma-webpack
- * mocha, chai, karma-coverage
  * @author Bichi Kim <bichi@live.co.kr>
  */
 
-const webpack = require('./webpack.test.config.js')
+// const webpack = require('./webpack.test.config.js')
 module.exports = function(config) {
   config.set({
-    browsers: ['ChromeHeadlessWithoutSecurity'],
-    frameworks: ['mocha', 'chai'],
-    reporters: ['spec', 'coverage', 'remap-coverage'],
+    frameworks: ['mocha', 'chai', 'karma-typescript'],
     files: [
-      '../node_modules/@babel/polyfill/dist/polyfill.js',
-      {pattern: '../src/**/*.spec.js', watched: false},
-      {pattern: '../src/**/*.spec.ts', watched: false},
-      {pattern: '../test/specs/**/*.spec.js', watched: false},
-      {pattern: '../test/specs/**/*.spec.ts', watched: false},
-    ],
-    exclude: [
-      '../src/**/*.spec.skip.js',
-      '../src/**/*.spec.skip.ts',
+      '../src/**/*.ts', // *.tsx for React Jsx
     ],
     preprocessors: {
-      '../src/**/*.js': ['webpack', 'sourcemap'],
-      '../src/**/*.ts': ['webpack', 'sourcemap'],
-      '../test/specs/**/*.js': ['webpack', 'sourcemap'],
-      '../test/specs/**/*.ts': ['webpack', 'sourcemap'],
-    },
-    coverageReporter: {
-      type: 'in-memory',
-    },
-    remapCoverageReporter: {
-      'text-summary': null,
-      lcovonly: './coverage/lcov.info',
-      html: './coverage/html',
-      cobertura: './coverage/cobertura.xml',
-    },
-    webpack,
-    webpackMiddleware: {
-      noInfo: true,
+      '../**/*.ts': 'karma-typescript', // *.tsx for React Jsx
     },
     logLevel: config.LOG_INFO,
-    colors: true,
+    reporters: ['spec', 'karma-typescript'],
     customLaunchers: {
       ChromeWithoutSecurity: {
         base: 'Chrome',
@@ -54,8 +25,34 @@ module.exports = function(config) {
         flags: ['--disable-web-security'],
       },
     },
-    mime: {
-      'text/x-typescript': ['ts'],
+    karmaTypescriptConfig: {
+      reports: {
+        html: 'coverage',
+        lcovonly: 'coverage',
+        'text-summary': '',
+      },
+      tsconfig: '../tsconfig.json',
+      bundlerOptions: {
+        resolve: {
+          directories: ['../node_modules'],
+        },
+      },
+      compilerOptions: {
+        declaration: false,
+        declarationDir: false,
+        emitDecoratorMetadata: true,
+        experimentalDecorators: true,
+        jsx: 'react',
+        module: 'commonjs',
+        sourceMap: true,
+        target: 'es5',
+        allowJs: true,
+      },
+      exclude: ['../node_modules'],
+      include: [
+        '../src/**/*.ts',
+        '../types/**/*.d.ts',
+      ],
     },
   })
 }

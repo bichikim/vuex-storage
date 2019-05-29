@@ -177,8 +177,8 @@ export default class VuexStorage<S extends any> {
       this.clear()
       const cookies = new Cookies(context, isClient())
       if(cookie && cookies){
+        /* istanbul ignore next */
         const {
-          /* istanbul ignore next */
           options = {},
         } = cookie
         cookies.set(
