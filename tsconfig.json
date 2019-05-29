@@ -8,6 +8,10 @@
       "es2015",
       "esnext"
     ],
+    "typeRoots": [
+      "node_modules/@types",
+      "types"
+    ],
     "noEmitHelpers": false,
     "noImplicitAny": true,
     "allowJs": false,

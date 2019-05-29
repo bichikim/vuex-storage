@@ -15,10 +15,13 @@ module.exports = function(config) {
     files: [
       '../node_modules/@babel/polyfill/dist/polyfill.js',
       {pattern: '../src/**/*.spec.js', watched: false},
+      {pattern: '../src/**/*.spec.ts', watched: false},
       {pattern: '../test/specs/**/*.spec.js', watched: false},
+      {pattern: '../test/specs/**/*.spec.ts', watched: false},
     ],
     exclude: [
       '../src/**/*.spec.skip.js',
+      '../src/**/*.spec.skip.ts',
     ],
     preprocessors: {
       '../src/**/*.js': ['webpack', 'sourcemap'],

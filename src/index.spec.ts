@@ -1,15 +1,15 @@
 /* tslint:disable:no-unused-expression */
 /* eslint-disable no-global-assign,no-new */
-import VuexStorage from './'
-import Vuex from 'vuex'
-import Vue from 'vue'
-import {serialize, parse} from 'cookie'
-import Cookies from 'universal-cookie'
+import {parse, serialize} from 'cookie'
 import {cloneDeep} from 'lodash'
+import Cookies from 'universal-cookie'
+import Vue from 'vue'
+import Vuex from 'vuex'
+import VuexStorage from './'
 const cookies = new Cookies()
 describe('vuex-storage', () => {
   if(!window.process){
-    window.process = {}
+    window.process = {} as any
   }
   Vue.config.productionTip = false
   Vue.config.devtools = false
@@ -34,7 +34,7 @@ describe('vuex-storage', () => {
   const CHANGE_SESSION_TEST = 'changeSessionTest'
   const CHANGE_COOKIE_TEST = 'changeCookieTest'
   const CHANGE_RESULT = 'testDone'
-  const state = {
+  const state: any = {
     state: {
       localTest: null,
       sessionTest: null,
@@ -61,17 +61,17 @@ describe('vuex-storage', () => {
       },
     },
     mutations: {
-      [CHANGE_LOCAL_TEST](state) {
+      [CHANGE_LOCAL_TEST](state: any) {
         state.localTest = CHANGE_RESULT
         state.deepLocalTest.foo = CHANGE_RESULT
         state.deepLocalTest.bar = CHANGE_RESULT
       },
-      [CHANGE_SESSION_TEST](state) {
+      [CHANGE_SESSION_TEST](state: any) {
         state.sessionTest = CHANGE_RESULT
         state.deepSessionTest.foo = CHANGE_RESULT
         state.deepSessionTest.bar = CHANGE_RESULT
       },
-      [CHANGE_COOKIE_TEST](state) {
+      [CHANGE_COOKIE_TEST](state: any) {
         state.cookieTest = CHANGE_RESULT
         state.deepCookieTest.foo = CHANGE_RESULT
         state.deepCookieTest.bar = CHANGE_RESULT
@@ -138,7 +138,7 @@ describe('vuex-storage', () => {
   describe('restore', () => {
     it('should restore for local, session & cookie', function test() {
       const vuexStorage = new VuexStorage(vuexStorageOptions)
-      const store = new Vuex.Store({
+      const store = new Vuex.Store<any>({
         ...cloneDeep(state),
         plugins: [vuexStorage.plugin],
       })
@@ -179,7 +179,7 @@ describe('vuex-storage', () => {
         ...vuexStorageOptions,
         key,
       })
-      const store = new Vuex.Store({
+      const store = new Vuex.Store<any>({
         ...cloneDeep(state),
         plugins: [vuexStorage.plugin],
       })
@@ -199,7 +199,7 @@ describe('vuex-storage', () => {
         ...vuexStorageOptions,
         restore: false,
       })
-      const store = new Vuex.Store({
+      const store = new Vuex.Store<any>({
         ...cloneDeep(state),
         plugins: [vuexStorage.plugin],
       })
@@ -215,7 +215,7 @@ describe('vuex-storage', () => {
     })
     it('should not restore with no options', function test() {
       const vuexStorage = new VuexStorage()
-      const store = new Vuex.Store({
+      const store = new Vuex.Store<any>({
         ...cloneDeep(state),
         plugins: [vuexStorage.plugin],
       })
@@ -235,7 +235,7 @@ describe('vuex-storage', () => {
         session: {},
         cookie: {},
       })
-      const store = new Vuex.Store({
+      const store = new Vuex.Store<any>({
         ...cloneDeep(state),
         plugins: [vuexStorage.plugin],
       })
@@ -254,7 +254,7 @@ describe('vuex-storage', () => {
         ...vuexStorageOptions,
         strict: true,
       })
-      const store = new Vuex.Store({
+      const store = new Vuex.Store<any>({
         ...cloneDeep(state),
         plugins: [vuexStorage.plugin],
         mutations: {
@@ -280,7 +280,7 @@ describe('vuex-storage', () => {
         strict: true,
         mutationName,
       })
-      const store = new Vuex.Store({
+      const store = new Vuex.Store<any>({
         ...cloneDeep(state),
         plugins: [vuexStorage.plugin],
         mutations: {
@@ -313,7 +313,7 @@ describe('vuex-storage', () => {
         },
         storageFirst: false,
       })
-      const store = new Vuex.Store({
+      const store = new Vuex.Store<any>({
         ...cloneDeep(state),
         state: {
           localTest: null,
@@ -364,7 +364,7 @@ describe('vuex-storage', () => {
         storageFirst: false,
         strict: true,
       })
-      const store = new Vuex.Store({
+      const store = new Vuex.Store<any>({
         ...cloneDeep(state),
         state: {
           localTest: null,
@@ -406,7 +406,7 @@ describe('vuex-storage', () => {
       expect(store.state.deepCookieTest.bar).to.equal('bar')
     })
     it('should restore Nuxt', function test() {
-      let _callback
+      let _callback: any
       window.onNuxtReady = (callback) => {
         _callback = callback
       }
@@ -414,7 +414,7 @@ describe('vuex-storage', () => {
         ...vuexStorageOptions,
         clientSide: true,
       })
-      const store = new Vuex.Store({
+      const store = new Vuex.Store<any>({
         ...cloneDeep(state),
         plugins: [vuexStorage.plugin],
       })
@@ -434,7 +434,7 @@ describe('vuex-storage', () => {
   describe('save', function test() {
     it('should save', function test() {
       const vuexStorage = new VuexStorage(vuexStorageOptions)
-      const store = new Vuex.Store({
+      const store = new Vuex.Store<any>({
         ...cloneDeep(state),
         plugins: [vuexStorage.plugin],
       })
@@ -471,10 +471,12 @@ describe('vuex-storage', () => {
     })
   })
   describe('nuxtServerInit', () => {
-    const that = {}
+    const that: any = {}
     let resCookie = serialize('other', JSON.stringify({test: 'test'}))
     beforeEach(() => {
-      cookies.set(key, {}, {path: '/'})
+      localStorage.clear()
+      sessionStorage.clear()
+      // cookies.set(key, {}, {path: '/'})
       process.server = true
       that.cookie = {
         cookieTest: 'test',
@@ -487,7 +489,7 @@ describe('vuex-storage', () => {
         path: '/',
         method: 'GET',
         headers: {
-          cookie: serialize(key, JSON.stringify({...cookie})),
+          cookie: serialize(key, JSON.stringify({...that.cookie})),
         },
       }
 
@@ -495,9 +497,9 @@ describe('vuex-storage', () => {
         getHeader() {
           return resCookie
         },
-        setHeader(name, cookies) {
+        setHeader(name: string, cookies: any) {
           expect(name).to.equal('set-cookie')
-          const resultCookie = {...cookie}
+          const resultCookie = {...that.cookie}
           delete resultCookie.deepCookieTest.bar
           expect(parse(cookies)).to.deep.equal(parse([
             serialize(key, JSON.stringify(resultCookie), {path: '/'}),
@@ -512,7 +514,7 @@ describe('vuex-storage', () => {
         ...vuexStorageOptions,
         clientSide: false,
       })
-      const store = new Vuex.Store({
+      const store = new Vuex.Store<any>({
         ...cloneDeep(state),
         plugins: [vuexStorage.plugin],
         actions: {

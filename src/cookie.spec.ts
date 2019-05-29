@@ -1,10 +1,10 @@
-import Cookie from './cookie'
-import * as cookieModule from 'cookie'
 import {expect} from 'chai'
+import * as cookieModule from 'cookie'
+import Cookie from './cookie'
 
 describe('cookie', function test() {
   describe('cookie in browser', () => {
-    const that = {}
+    const that: any = {}
     that.cookie = new Cookie()
     that.testData = {test: 'test'}
     that.test1Data = {test1: 'test1'}
@@ -50,7 +50,7 @@ describe('cookie', function test() {
     })
   })
   describe('cookie in Nodejs server', function test() {
-    const that = {}
+    const that: any = {} as any
     let resCookie = ''
 
     before(() => {
@@ -67,7 +67,7 @@ describe('cookie', function test() {
         getHeader() {
           return resCookie
         },
-        setHeader(name, value) {
+        setHeader(name: string, value: any) {
           resCookie = value
         },
       }
@@ -84,7 +84,7 @@ describe('cookie', function test() {
     })
   })
   describe('cookie in Nodejs server with req.cookies', function test() {
-    const that = {}
+    const that: any = {}
     let resCookie = ''
     before(() => {
       const testData = {test: 'test'}
@@ -98,7 +98,7 @@ describe('cookie', function test() {
         getHeader() {
           return resCookie
         },
-        setHeader(name, value) {
+        setHeader(name: string, value: any) {
           resCookie = value
         },
       }

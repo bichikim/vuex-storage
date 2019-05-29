@@ -12,6 +12,7 @@
     "test": "npm run test:unit",
     "lint": "eslint \"src/\"",
     "test:unit": "karma start config/karma.config.js --browsers=PhantomJS --single-run",
+    "test:ts": "karma start config/karma.ts.config.js --browsers=Chrome --single-run",
     "preversion": "npm run test && npm run build"
   },
   "repository": {
@@ -59,6 +60,7 @@
     "karma-remap-coverage": "^0.1.5",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "^0.0.32",
+    "karma-typescript": "^4.0.0",
     "karma-webpack": "^4.0.0-rc.6",
     "mocha": "^6.0.2",
     "node-mocks-http": "^1.7.3",
@@ -66,11 +68,11 @@
     "ts-node": "^8.0.3",
     "tsconfig-paths": "^3.8.0",
     "tsconfig-paths-webpack-plugin": "^3.2.0",
-    "universal-cookie": "^4.0.0",
     "tslint": "^5.16.0",
     "typedoc": "^0.14.2",
     "typescript": "^3.4.5",
     "typescript-eslint-parser": "^22.0.0",
+    "universal-cookie": "^4.0.0",
     "webpack": "^4.29.5",
     "webpack-merge": "^4.1.4",
     "webpack-node-externals": "^1.7.2"

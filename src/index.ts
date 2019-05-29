@@ -36,7 +36,7 @@ export interface IVuexStorageOptions<S> {
   storageFirst?: boolean
   key?: string
   mutationName?: string
-  clientSide?: (store: Store<S>, options: IVuexStorageOptions<S>) => boolean | boolean
+  clientSide?: ((store: Store<S>, options: IVuexStorageOptions<S>) => boolean) | boolean
   /**
    * @deprecated
    */
