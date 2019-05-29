@@ -3,12 +3,12 @@ import {cloneDeep, merge, omit, pick} from 'lodash'
 import {ActionContext, Mutation, Store} from 'vuex'
 import {Plugin} from 'vuex'
 import Cookies, {CookieSerializeOptions} from './cookie'
-interface INuxtContext {
+export interface INuxtContext {
   req: Request,
   res: Response,
 }
 
-export interface IVuexStorageOptions<S> {
+export interface IFilters {
   /**
    * cookie storage
    */
@@ -21,6 +21,23 @@ export interface IVuexStorageOptions<S> {
    * local storage
    */
   local?: IFilterOptions
+}
+
+export interface IDynamicFilterObj {
+  cookie?: string
+  session?: string
+  local?: string
+}
+
+export type DynamicFilterFn<S> = (store: Store<S>, options: IVuexStorageOptions<S>) => IFilters
+
+export interface IVuexStorageOptions<S> {
+
+  /**
+   * override cookie, session and local by state
+   */
+  filter?: DynamicFilterFn<S> | IDynamicFilterObj
+
   /**
    * restore data from client storage
    */
@@ -61,15 +78,19 @@ export interface IFilterOptions {
 // saving mutation name
 function storeExceptOrOnly(_state: any, except?: string[], only?: string[]): any {
   const state = cloneDeep(_state)
-  let clonedState: any = {}
-  if(except){
-    clonedState = omit(state, except)
+  let clonedState = {}
+  if(!only && !except){
+    return clonedState
+  }
+  if(only){
+    clonedState = pick(state, only)
   }else{
     clonedState = state
   }
-  if(only){
-    clonedState = pick(clonedState, only)
+  if(except){
+    clonedState = omit(clonedState, except)
   }
+
   return clonedState
 }
 
@@ -85,15 +106,13 @@ export default class VuexStorage<S extends any> {
 
   constructor(options: IVuexStorageOptions<S> = {}) {
     const {
-      cookie,
       restore = true,
       isRun,
       strict = false,
       key = 'vuex',
-      local,
       mutationName = '__RESTORE_MUTATION',
-      session,
       storageFirst = true,
+      filter: dynamicFilter,
       clientSide,
     } = options
 
@@ -110,6 +129,24 @@ export default class VuexStorage<S extends any> {
         return clientSide
       }
       return typeof document === 'object'
+    }
+
+    const getStateFilter = (dynamicFilter: IDynamicFilterObj): IFilters => {
+      return {
+        cookie: this._store.state[dynamicFilter.cookie],
+        session: this._store.state[dynamicFilter.session],
+        local: this._store.state[dynamicFilter.local],
+      }
+    }
+
+    const filters = (): IFilters => {
+      if(!dynamicFilter){
+        return {}
+      }
+
+      return  typeof dynamicFilter === 'function' ?
+        dynamicFilter(this._store, options) :
+        getStateFilter(dynamicFilter)
     }
 
     this.mutationName = mutationName
@@ -135,6 +172,7 @@ export default class VuexStorage<S extends any> {
     this.restore = (context?: INuxtContext) => {
       const store = this._store
       let cookieState = {}
+      const {cookie, session, local} = filters()
       if(cookie){
         const cookies = new Cookies(context, isClient())
         cookieState = storeExceptOrOnly(cookies.get(key), cookie.except, cookie.only)
@@ -175,6 +213,7 @@ export default class VuexStorage<S extends any> {
 
     this.save = (state: any, context?: INuxtContext) => {
       this.clear()
+      const {cookie, session, local} = filters()
       const cookies = new Cookies(context, isClient())
       if(cookie && cookies){
         /* istanbul ignore next */

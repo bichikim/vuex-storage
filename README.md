@@ -11,7 +11,7 @@
 [LICENSE IMAGE]:https://img.shields.io/npm/l/vuex-storage.svg
 [NPM LINK]:https://www.npmjs.org/package/vuex-storage
 ## How to use
-### Shape of using
+### Default using
 ```javascript
 import Vue from 'vue'
 import Vuex from 'vuex'
@@ -20,8 +20,8 @@ Vue.use(Vuex)
 const vuexStorage = new VuexStorage({
   local: {
     expect: [],
-      only: [],
-    },
+    only: [],
+  },
   session: {
     expect: [],
     only: [],
@@ -113,8 +113,8 @@ const store = new Vuex.Store({
 
 ```
 
-### Storage targeting
-You can set what data you are going to save
+### Storage deep targeting
+You can set data what you are going to save
  
 ```javascript
 import VuexStorage from './src'
@@ -147,6 +147,15 @@ import VuexStorage from './src'
 new VuexStorage({
   storageFirst: true,
   session: {},
+})
+```
+
+### Dynamic filtering
+
+```javascript
+import VuexStorage from './src'
+new VuexStorage({
+  
 })
 ```
 
