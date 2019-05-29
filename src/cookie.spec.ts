@@ -68,6 +68,7 @@ describe('cookie', function test() {
           return resCookie
         },
         setHeader(name: string, value: any) {
+          expect(name).to.equal('set-cookie')
           resCookie = value
         },
       }

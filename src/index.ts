@@ -147,11 +147,13 @@ export default class VuexStorage<S extends any> {
         let sessionData = '{}'
         let localData = '{}'
         if(session){
-          sessionData = sessionStorage.getItem(key) || '{}'
+          sessionData = sessionStorage.getItem(key)
+            || /* istanbul ignore next: tired of writing tests */ '{}'
           sessionState = storeExceptOrOnly(JSON.parse(sessionData), session.except, session.only)
         }
         if(local){
-          localData = localStorage.getItem(key) || '{}'
+          localData = localStorage.getItem(key)
+            ||  /* istanbul ignore next: tired of writing tests */ '{}'
           localState = storeExceptOrOnly(JSON.parse(localData), local.except, local.only)
         }
       }
@@ -175,7 +177,10 @@ export default class VuexStorage<S extends any> {
       this.clear()
       const cookies = new Cookies(context, isClient())
       if(cookie && cookies){
-        const {options = {}} = cookie
+        const {
+          /* istanbul ignore next */
+          options = {},
+        } = cookie
         cookies.set(
           key,
           storeExceptOrOnly(

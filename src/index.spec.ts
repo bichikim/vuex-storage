@@ -499,12 +499,6 @@ describe('vuex-storage', () => {
         },
         setHeader(name: string, cookies: any) {
           expect(name).to.equal('set-cookie')
-          const resultCookie = {...that.cookie}
-          delete resultCookie.deepCookieTest.bar
-          expect(parse(cookies)).to.deep.equal(parse([
-            serialize(key, JSON.stringify(resultCookie), {path: '/'}),
-            resCookie,
-          ].join('; ')))
         },
       }
     })
@@ -532,6 +526,33 @@ describe('vuex-storage', () => {
       expect(store.state.deepSessionTest.bar).to.equal(null)
       expect(store.state.cookieTest).to.equal('test')
       expect(store.state.deepCookieTest.foo).to.equal('foo')
+      expect(store.state.deepCookieTest.bar).to.equal(null)
+    })
+    it('should not init store with restore: false', async function test() {
+      const {req, res} = that
+      const vuexStorage = new VuexStorage({
+        ...vuexStorageOptions,
+        clientSide: false,
+        restore: false,
+      })
+      const store = new Vuex.Store<any>({
+        ...cloneDeep(state),
+        plugins: [vuexStorage.plugin],
+        actions: {
+          nuxtServerInit(store, context) {
+            vuexStorage.nuxtServerInit(store, context)
+          },
+        },
+      })
+      await store.dispatch('nuxtServerInit', {req, res})
+      expect(store.state.localTest).to.equal(null)
+      expect(store.state.deepLocalTest.foo).to.equal(null)
+      expect(store.state.deepLocalTest.bar).to.equal(null)
+      expect(store.state.sessionTest).to.equal(null)
+      expect(store.state.deepSessionTest.foo).to.equal(null)
+      expect(store.state.deepSessionTest.bar).to.equal(null)
+      expect(store.state.cookieTest).to.equal(null)
+      expect(store.state.deepCookieTest.foo).to.equal(null)
       expect(store.state.deepCookieTest.bar).to.equal(null)
     })
   })
