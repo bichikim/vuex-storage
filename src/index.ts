@@ -112,6 +112,8 @@ export default class VuexStorage<S extends any> {
 
       let sessionState = {}
       let localState = {}
+
+      // get client storage data if it is client side
       if(isClient()){
         const {sessionStorage, localStorage} = window
         let sessionData = '{}'
