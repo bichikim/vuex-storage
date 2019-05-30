@@ -5,8 +5,7 @@
 ![npm](https://img.shields.io/npm/v/vuex-storage.svg)
 ![Codecov](https://img.shields.io/codecov/c/github/bichikim/vuex-storage.svg)
 ![Travis](https://img.shields.io/travis/bichikim/vuex-storage.svg)
-
-
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fbichikim%2Fvuex-storage.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fbichikim%2Fvuex-storage?ref=badge_shield)
 
 [LICENSE IMAGE]:https://img.shields.io/npm/l/vuex-storage.svg
 [NPM LINK]:https://www.npmjs.org/package/vuex-storage
