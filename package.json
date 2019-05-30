@@ -1,20 +1,27 @@
 {
   "name": "vuex-storage",
-  "version": "2.0.0-alpha.5",
+  "version": "2.0.0-alpha.6",
   "description": "vuex-storage",
   "author": "bichi",
-  "main": "dist/index.js",
+  "main": "dist/amd/index.js",
+  "module": "dist/esm/index.js",
   "types": "declarations/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.amd.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
     "doc": "typedoc -out ./docs ./src --media ./media",
     "test": "npm run test:unit",
     "lint": "eslint \"src/\"",
     "test:unit": "karma start config/karma.config.js --browsers=ChromeHeadlessWithoutSecurity --single-run",
     "test:watch": "karma start config/karma.config.js --browsers=ChromeHeadlessWithoutSecurity --auto-watch",
-    "preversion": "npm run test && npm run build"
+    "preversion": "npm run test && npm run build && npm run build:esm"
   },
+  "files": [
+    "dist",
+    "declarations",
+    "types"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bichikim/vuex-storage.git"
