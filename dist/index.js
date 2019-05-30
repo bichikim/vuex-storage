@@ -12,19 +12,10 @@ var __assign = (this && this.__assign) || function () {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-(function (factory) {
-    if (typeof module === "object" && typeof module.exports === "object") {
-        var v = factory(require, exports);
-        if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "lodash", "./cookie"], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports", "lodash", "./cookie"], function (require, exports, lodash_1, cookie_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var lodash_1 = require("lodash");
-    var cookie_1 = __importDefault(require("./cookie"));
+    cookie_1 = __importDefault(cookie_1);
     exports.DEFAULT_KEY = 'vuex';
     exports.DEFAULT_MUTATION_NAME = '__RESTORE_MUTATION';
     // saving mutation name

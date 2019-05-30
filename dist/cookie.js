@@ -16,19 +16,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
-(function (factory) {
-    if (typeof module === "object" && typeof module.exports === "object") {
-        var v = factory(require, exports);
-        if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "cookie", "lodash"], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports", "cookie", "lodash"], function (require, exports, cookie, lodash_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var cookie = __importStar(require("cookie"));
-    var lodash_1 = require("lodash");
+    cookie = __importStar(cookie);
     var SET_COOKIE = 'set-cookie';
     var Cookies = /** @class */ (function () {
         function Cookies(options, isClient) {

@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "umd",
+    "module": "amd",
     "target": "es5",
     "outDir": "dist"
   },
