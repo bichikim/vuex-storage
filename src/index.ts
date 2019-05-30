@@ -39,7 +39,6 @@ export default class VuexStorage<S extends any> {
   constructor(options: IVuexStorageOptions<S> = {}) {
     const {
       restore = true,
-      isRun,
       strict = false,
       key = DEFAULT_KEY,
       mutationName = DEFAULT_MUTATION_NAME,
@@ -47,11 +46,6 @@ export default class VuexStorage<S extends any> {
       filter: dynamicFilter,
       clientSide,
     } = options
-
-    /* istanbul ignore if */
-    if(isRun){
-      console.warn('please do not use the isRun option')
-    }
 
     const isClient = (): boolean => {
       if(typeof clientSide === 'function'){

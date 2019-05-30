@@ -12,6 +12,9 @@ interface IDefaultState {
   localTest: string | number
   sessionTest: string | number
   cookieTest: string | number
+  __local: {only: string[], except: string[]}
+  __session: {only: string[], except: string[]}
+  __cookie: {only: string[], except: string[]}
 }
 describe('vuex-storage', () => {
   if(!window.process){
@@ -29,7 +32,7 @@ describe('vuex-storage', () => {
       cookie: '__cookie',
     },
   }
-  const state: StoreOptions<IDefaultState> = {
+  const state: StoreOptions<IDefaultState | any> = {
     state: {
       localTest: null,
       sessionTest: null,
@@ -325,6 +328,42 @@ describe('vuex-storage', () => {
       expect(store.state.deepCookieTest.foo).to.equal(null)
       expect(store.state.deepCookieTest.bar).to.equal(null)
     })
+    it('should restore with only except options', function test() {
+      const vuexStorage = new VuexStorage({
+        ...vuexStorageOptions,
+      })
+      const store = new Vuex.Store<any>({
+        ...cloneDeep(state),
+        plugins: [vuexStorage.plugin],
+        modules: {
+          ...state.modules,
+          __local: {
+            state: {
+              except: ['deepLocalTest.bar'],
+            },
+          },
+          __session: {
+            state: {
+              except: ['deepSessionTest.bar'],
+            },
+          },
+          __cookie: {
+            state: {
+              except: ['deepCookieTest.bar'],
+            },
+          },
+        },
+      })
+      expect(store.state.localTest).to.equal('test')
+      expect(store.state.deepLocalTest.foo).to.equal('foo')
+      expect(store.state.deepLocalTest.bar).to.equal(null)
+      expect(store.state.sessionTest).to.equal('test')
+      expect(store.state.deepSessionTest.foo).to.equal('foo')
+      expect(store.state.deepSessionTest.bar).to.equal(null)
+      expect(store.state.cookieTest).to.equal('test')
+      expect(store.state.deepCookieTest.foo).to.equal('foo')
+      expect(store.state.deepCookieTest.bar).to.equal(null)
+    })
     it('should restore with strict true', function test() {
       const vuexStorage = new VuexStorage({
         ...vuexStorageOptions,
@@ -531,10 +570,93 @@ describe('vuex-storage', () => {
       expect(store.state.deepCookieTest.foo).to.equal('foo')
       expect(store.state.deepCookieTest.bar).to.equal(null)
     })
-    it('should do well with dynamic filter', function test() {
+    it('should restore state with dynamic filter', function test() {
       const vuexStorage = new VuexStorage({
         ...vuexStorageOptions,
         strict: true,
+      })
+      const store = new Vuex.Store<any>({
+        ...cloneDeep(state),
+        plugins: [vuexStorage.plugin],
+        modules: {
+          ...state.modules,
+          __local: {
+            namespaced: true,
+            state: {
+              only: [],
+            },
+            mutations: {
+              saveOnly(state, payload) {
+                state.only = payload
+              },
+            },
+          },
+          __cookie: {
+            namespaced: true,
+            state: {
+              only: [],
+            },
+            mutations: {
+              saveOnly(state, payload) {
+                state.only = payload
+              },
+            },
+          },
+          __session: {
+            namespaced: true,
+            state: {
+              only: [],
+            },
+            mutations: {
+              saveOnly(state, payload) {
+                state.only = payload
+              },
+            },
+          },
+        },
+        mutations: {
+          ...state.mutations,
+          [vuexStorage.mutationName]: vuexStorage.mutation,
+        },
+        strict: true,
+      })
+
+      // local
+      expect(store.state.localTest).to.equal(null)
+      expect(store.state.deepLocalTest.foo).to.equal(null)
+      expect(store.state.deepLocalTest.bar).to.equal(null)
+      store.commit('deepLocalTest/saveFoo', 'foo')
+      expect(JSON.parse(localStorage.getItem(key)).deepLocalTest).to.be.an('undefined')
+      store.commit('__local/saveOnly', ['deepLocalTest'])
+      expect(JSON.parse(localStorage.getItem(key)).deepLocalTest.foo).to.equal('foo')
+
+      // cookie
+      expect(store.state.cookieTest).to.equal(null)
+      expect(store.state.deepCookieTest.foo).to.equal(null)
+      expect(store.state.deepCookieTest.bar).to.equal(null)
+      store.commit('deepCookieTest/saveFoo', 'foo')
+      expect(cookies.get(key).deepCookieTest).to.be.an('undefined')
+      store.commit('__cookie/saveOnly', ['deepCookieTest'])
+      expect(cookies.get(key).deepCookieTest.foo).to.equal('foo')
+
+      // session
+      expect(store.state.sessionTest).to.equal(null)
+      expect(store.state.deepSessionTest.foo).to.equal(null)
+      expect(store.state.deepSessionTest.bar).to.equal(null)
+      store.commit('deepSessionTest/saveFoo', 'foo')
+      expect(JSON.parse(sessionStorage.getItem(key)).deepSessionTest).to.be.an('undefined')
+      store.commit('__session/saveOnly', ['deepSessionTest'])
+      expect(JSON.parse(sessionStorage.getItem(key)).deepSessionTest.foo).to.equal('foo')
+    })
+    it('should restore state with function dynamic filter', function test() {
+      const vuexStorage = new VuexStorage<IDefaultState>({
+        ...vuexStorageOptions,
+        strict: true,
+        filter: (store) => ({
+          local: store.state.__local,
+          session: store.state.__session,
+          cookie: store.state.__cookie,
+        }),
       })
       const store = new Vuex.Store<any>({
         ...cloneDeep(state),

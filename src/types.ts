@@ -68,6 +68,24 @@ export interface IVuexStorageOptions<S> {
    * please use strict
    */
   isStrictMode?: boolean
+
+  /**
+   * @deprecated
+   * please use filter
+   */
+  local?: any
+
+  /**
+   * @deprecated
+   * please use filter
+   */
+  session?: any
+
+  /**
+   * @deprecated
+   * please use filter
+   */
+  cookie?: any
 }
 
 export interface INuxtContext {
