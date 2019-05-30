@@ -1,12 +1,12 @@
 /* tslint:disable:no-unused-expression */
-/* eslint-disable no-global-assign,no-new */
+/* eslint-disable no-new*/
 import {parse, serialize} from 'cookie'
 import {cloneDeep} from 'lodash'
 import Cookies from 'universal-cookie'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import {StoreOptions} from 'vuex'
-import VuexStorage, {DEFAULT_KEY} from './'
+import VuexStorage, {DEFAULT_KEY, FILTERS_KEY} from './'
 const cookies = new Cookies()
 interface IDefaultState {
   localTest: string | number
@@ -24,6 +24,7 @@ describe('vuex-storage', () => {
   Vue.config.devtools = false
   Vue.use(Vuex)
   const key = DEFAULT_KEY
+  const filtersKey = FILTERS_KEY
   const keySec = 'testSec'
   const vuexStorageOptions = {
     filter: {
@@ -143,6 +144,7 @@ describe('vuex-storage', () => {
     },
   }
   beforeEach('set storage', () => {
+
     // for default key
     window.localStorage.setItem(key, JSON.stringify({
       localTest: 'test',
@@ -648,88 +650,128 @@ describe('vuex-storage', () => {
       store.commit('__session/saveOnly', ['deepSessionTest'])
       expect(JSON.parse(sessionStorage.getItem(key)).deepSessionTest.foo).to.equal('foo')
     })
-    it('should restore state with function dynamic filter', function test() {
-      const vuexStorage = new VuexStorage<IDefaultState>({
+    // it('should restore state with function dynamic filter', function test() {
+    //   const vuexStorage = new VuexStorage<IDefaultState>({
+    //     ...vuexStorageOptions,
+    //     strict: true,
+    //     filter: (store) => ({
+    //       local: store.state.__local,
+    //       session: store.state.__session,
+    //       cookie: store.state.__cookie,
+    //     }),
+    //   })
+    //   const store = new Vuex.Store<any>({
+    //     ...cloneDeep(state),
+    //     plugins: [vuexStorage.plugin],
+    //     modules: {
+    //       ...state.modules,
+    //       __local: {
+    //         namespaced: true,
+    //         state: {
+    //           only: [],
+    //         },
+    //         mutations: {
+    //           saveOnly(state, payload) {
+    //             state.only = payload
+    //           },
+    //         },
+    //       },
+    //       __cookie: {
+    //         namespaced: true,
+    //         state: {
+    //           only: [],
+    //         },
+    //         mutations: {
+    //           saveOnly(state, payload) {
+    //             state.only = payload
+    //           },
+    //         },
+    //       },
+    //       __session: {
+    //         namespaced: true,
+    //         state: {
+    //           only: [],
+    //         },
+    //         mutations: {
+    //           saveOnly(state, payload) {
+    //             state.only = payload
+    //           },
+    //         },
+    //       },
+    //     },
+    //     mutations: {
+    //       ...state.mutations,
+    //       [vuexStorage.mutationName]: vuexStorage.mutation,
+    //     },
+    //     strict: true,
+    //   })
+    //
+    //   // local
+    //   expect(store.state.localTest).to.equal(null)
+    //   expect(store.state.deepLocalTest.foo).to.equal(null)
+    //   expect(store.state.deepLocalTest.bar).to.equal(null)
+    //   store.commit('deepLocalTest/saveFoo', 'foo')
+    //   expect(JSON.parse(localStorage.getItem(key)).deepLocalTest).to.be.an('undefined')
+    //   store.commit('__local/saveOnly', ['deepLocalTest'])
+    //   expect(JSON.parse(localStorage.getItem(key)).deepLocalTest.foo).to.equal('foo')
+    //
+    //   // cookie
+    //   expect(store.state.cookieTest).to.equal(null)
+    //   expect(store.state.deepCookieTest.foo).to.equal(null)
+    //   expect(store.state.deepCookieTest.bar).to.equal(null)
+    //   store.commit('deepCookieTest/saveFoo', 'foo')
+    //   expect(cookies.get(key).deepCookieTest).to.be.an('undefined')
+    //   store.commit('__cookie/saveOnly', ['deepCookieTest'])
+    //   expect(cookies.get(key).deepCookieTest.foo).to.equal('foo')
+    //
+    //   // session
+    //   expect(store.state.sessionTest).to.equal(null)
+    //   expect(store.state.deepSessionTest.foo).to.equal(null)
+    //   expect(store.state.deepSessionTest.bar).to.equal(null)
+    //   store.commit('deepSessionTest/saveFoo', 'foo')
+    //   expect(JSON.parse(sessionStorage.getItem(key)).deepSessionTest).to.be.an('undefined')
+    //   store.commit('__session/saveOnly', ['deepSessionTest'])
+    //   expect(JSON.parse(sessionStorage.getItem(key)).deepSessionTest.foo).to.equal('foo')
+    // })
+  })
+  describe('restore filter', function test() {
+    it('should restore filter state', function test() {
+      window.localStorage.setItem(filtersKey, JSON.stringify({
+        __local: {
+          only: ['localTest', 'deepLocalTest'],
+          except: ['deepLocalTest.bar'],
+        },
+        __session: {
+          only: ['sessionTest', 'deepSessionTest'],
+          except: ['deepSessionTest.bar'],
+        },
+        __cookie: {
+          only: ['cookieTest', 'deepCookieTest'],
+          except: ['deepCookieTest.bar'],
+        },
+      }))
+      const vuexStorage = new VuexStorage({
         ...vuexStorageOptions,
-        strict: true,
-        filter: (store) => ({
-          local: store.state.__local,
-          session: store.state.__session,
-          cookie: store.state.__cookie,
-        }),
       })
       const store = new Vuex.Store<any>({
         ...cloneDeep(state),
         plugins: [vuexStorage.plugin],
         modules: {
           ...state.modules,
-          __local: {
-            namespaced: true,
-            state: {
-              only: [],
-            },
-            mutations: {
-              saveOnly(state, payload) {
-                state.only = payload
-              },
-            },
-          },
-          __cookie: {
-            namespaced: true,
-            state: {
-              only: [],
-            },
-            mutations: {
-              saveOnly(state, payload) {
-                state.only = payload
-              },
-            },
-          },
-          __session: {
-            namespaced: true,
-            state: {
-              only: [],
-            },
-            mutations: {
-              saveOnly(state, payload) {
-                state.only = payload
-              },
-            },
-          },
+          __local: {},
+          __session: {},
+          __cookie: {},
         },
-        mutations: {
-          ...state.mutations,
-          [vuexStorage.mutationName]: vuexStorage.mutation,
-        },
-        strict: true,
       })
-
-      // local
-      expect(store.state.localTest).to.equal(null)
-      expect(store.state.deepLocalTest.foo).to.equal(null)
+      expect(store.state.localTest).to.equal('test')
+      expect(store.state.deepLocalTest.foo).to.equal('foo')
       expect(store.state.deepLocalTest.bar).to.equal(null)
-      store.commit('deepLocalTest/saveFoo', 'foo')
-      expect(JSON.parse(localStorage.getItem(key)).deepLocalTest).to.be.an('undefined')
-      store.commit('__local/saveOnly', ['deepLocalTest'])
-      expect(JSON.parse(localStorage.getItem(key)).deepLocalTest.foo).to.equal('foo')
-
-      // cookie
-      expect(store.state.cookieTest).to.equal(null)
-      expect(store.state.deepCookieTest.foo).to.equal(null)
-      expect(store.state.deepCookieTest.bar).to.equal(null)
-      store.commit('deepCookieTest/saveFoo', 'foo')
-      expect(cookies.get(key).deepCookieTest).to.be.an('undefined')
-      store.commit('__cookie/saveOnly', ['deepCookieTest'])
-      expect(cookies.get(key).deepCookieTest.foo).to.equal('foo')
-
-      // session
-      expect(store.state.sessionTest).to.equal(null)
-      expect(store.state.deepSessionTest.foo).to.equal(null)
+      expect(store.state.sessionTest).to.equal('test')
+      expect(store.state.deepSessionTest.foo).to.equal('foo')
       expect(store.state.deepSessionTest.bar).to.equal(null)
-      store.commit('deepSessionTest/saveFoo', 'foo')
-      expect(JSON.parse(sessionStorage.getItem(key)).deepSessionTest).to.be.an('undefined')
-      store.commit('__session/saveOnly', ['deepSessionTest'])
-      expect(JSON.parse(sessionStorage.getItem(key)).deepSessionTest.foo).to.equal('foo')
+      expect(store.state.cookieTest).to.equal('test')
+      expect(store.state.deepCookieTest.foo).to.equal('foo')
+      expect(store.state.deepCookieTest.bar).to.equal(null)
     })
   })
   describe('save', function test() {
@@ -854,6 +896,83 @@ describe('vuex-storage', () => {
           foo: CHANGE_RESULT,
           bar: CHANGE_RESULT,
         },
+      })
+    })
+  })
+  describe('save filter', function test() {
+    it('should restore filter state', function test() {
+      window.localStorage.setItem(filtersKey, JSON.stringify({
+        __local: {
+          only: ['localTest', 'deepLocalTest'],
+          except: ['deepLocalTest.bar'],
+        },
+        __session: {
+          only: ['sessionTest', 'deepSessionTest'],
+          except: ['deepSessionTest.bar'],
+        },
+        __cookie: {
+          only: ['cookieTest', 'deepCookieTest'],
+          except: ['deepCookieTest.bar'],
+        },
+      }))
+      const vuexStorage = new VuexStorage({
+        ...vuexStorageOptions,
+      })
+      const store = new Vuex.Store<any>({
+        ...cloneDeep(state),
+        plugins: [vuexStorage.plugin],
+        modules: {
+          ...state.modules,
+          __local: {
+            namespaced: true,
+            mutations: {
+              saveOnly(state: any, payload: any) {
+                state.only = payload
+              },
+              saveExcept(state: any, payload: any) {
+                state.except = payload
+              },
+            },
+          },
+          __session: {
+            namespaced: true,
+            mutations: {
+              saveOnly(state: any, payload: any) {
+                state.only = payload
+              },
+              saveExcept(state: any, payload: any) {
+                state.except = payload
+              },
+            },
+          },
+          __cookie: {
+            namespaced: true,
+            mutations: {
+              saveOnly(state: any, payload: any) {
+                state.only = payload
+              },
+              saveExcept(state: any, payload: any) {
+                state.except = payload
+              },
+            },
+          },
+        },
+      })
+      store.commit('__local/saveOnly', ['deepLocalTest'])
+      store.commit('__session/saveOnly', ['deepSessionTest'])
+      store.commit('__cookie/saveOnly', ['deepCookieTest'])
+      const filter = JSON.parse(window.localStorage.getItem(filtersKey))
+      expect(filter.__local).to.deep.equal({
+        only: ['deepLocalTest'],
+        except: ['deepLocalTest.bar'],
+      })
+      expect(filter.__session).to.deep.equal({
+        only: ['deepSessionTest'],
+        except: ['deepSessionTest.bar'],
+      })
+      expect(filter.__cookie).to.deep.equal({
+        only: ['deepCookieTest'],
+        except: ['deepCookieTest.bar'],
       })
     })
   })

@@ -1,10 +1,12 @@
-import {cloneDeep, merge, omit, pick} from 'lodash'
+import {cloneDeep, get, merge, omit, pick} from 'lodash'
 import {ActionContext, Mutation, Store} from 'vuex'
 import {Plugin} from 'vuex'
 import Cookies, {CookieSerializeOptions} from './cookie'
 import {IDynamicFilterObj, IFilters, INuxtContext, IVuexStorageOptions} from './types'
 
 export const DEFAULT_KEY = 'vuex'
+export const FILTERS_KEY = 'vuex-filters'
+export const DEFAULT_SAVE_METHOD = 'localStorage'
 export const DEFAULT_MUTATION_NAME = '__RESTORE_MUTATION'
 
 // saving mutation name
@@ -31,7 +33,9 @@ export default class VuexStorage<S extends any> {
   readonly mutation: Mutation<S>
   readonly plugin: Plugin<S>
   readonly restore: (context?: INuxtContext) => void
+  readonly restoreFilter: (context?: INuxtContext) => void
   readonly save: (state: any, context?: INuxtContext) => void
+  readonly saveFilter: (state: any, context?: INuxtContext) => void
   readonly clear: () => void
   readonly nuxtServerInit: (actionContext: ActionContext<S, S>, nuxtContext: INuxtContext) => void
   private _store: Store<S>
@@ -45,6 +49,8 @@ export default class VuexStorage<S extends any> {
       storageFirst = true,
       filter: dynamicFilter,
       clientSide,
+      filterSaveKey = FILTERS_KEY,
+      filterSaveMethod = DEFAULT_SAVE_METHOD,
     } = options
 
     const isClient = (): boolean => {
@@ -59,9 +65,9 @@ export default class VuexStorage<S extends any> {
 
     const getStateFilter = (dynamicFilter: IDynamicFilterObj): IFilters => {
       return {
-        cookie: this._store.state[dynamicFilter.cookie],
-        session: this._store.state[dynamicFilter.session],
-        local: this._store.state[dynamicFilter.local],
+        cookie: get<any, string>(this._store.state, dynamicFilter.cookie),
+        session: get<any, string>(this._store.state, dynamicFilter.session),
+        local: get<any, string>(this._store.state, dynamicFilter.local),
       }
     }
 
@@ -70,9 +76,7 @@ export default class VuexStorage<S extends any> {
         return {}
       }
 
-      return  typeof dynamicFilter === 'function' ?
-        dynamicFilter(this._store, options) :
-        getStateFilter(dynamicFilter)
+      return getStateFilter(dynamicFilter)
     }
 
     this.mutationName = mutationName
@@ -95,6 +99,39 @@ export default class VuexStorage<S extends any> {
       localStorage.setItem(key, '{}')
     }
 
+    const mergeState = (state: any) => {
+      const store = this._store
+      let _state = state
+      const originalState = cloneDeep(store.state)
+      if(storageFirst){
+        _state = merge(originalState, state)
+      }else{
+        _state = merge(state, originalState)
+      }
+      if(strict){
+        store.commit(mutationName, _state)
+      }else{
+        store.replaceState(_state)
+      }
+    }
+
+    this.restoreFilter = (context?: INuxtContext) => {
+      const store = this._store
+      let localState = {}
+      let cookieState = {}
+
+      if(filterSaveMethod === 'localStorage'){
+        if(!isClient()){
+          return
+        }
+        localState = JSON.parse(localStorage.getItem(filterSaveKey) || '{}')
+      }else{
+        const cookies = new Cookies(context, isClient())
+        cookieState = cookies.get(filterSaveKey)
+      }
+      mergeState(merge(localState, cookieState))
+    }
+
     this.restore = (context?: INuxtContext) => {
       const store = this._store
       let cookieState = {}
@@ -109,7 +146,6 @@ export default class VuexStorage<S extends any> {
 
       // get client storage data if it is client side
       if(isClient()){
-        const {sessionStorage, localStorage} = window
         let sessionData = '{}'
         let localData = '{}'
         if(session){
@@ -123,24 +159,28 @@ export default class VuexStorage<S extends any> {
           localState = storeExceptOrOnly(JSON.parse(localData), local.except, local.only)
         }
       }
+      mergeState(merge(sessionState, localState, cookieState))
+    }
 
-      let state: any = merge(sessionState, localState, cookieState)
-      const originalState = cloneDeep(store.state)
-      if(storageFirst){
-        state = merge(originalState, state)
+    this.saveFilter = (state: any, context?: INuxtContext) => {
+      const filterOnly = dynamicFilter ?
+        [dynamicFilter.local, dynamicFilter.cookie, dynamicFilter.session] :
+        undefined
+      if(filterSaveMethod === 'localStorage'){
+        if(!isClient()){
+          return
+        }
+        localStorage.setItem(
+          filterSaveKey,
+          JSON.stringify(storeExceptOrOnly(state, undefined, filterOnly)),
+        )
       }else{
-        state = merge(state, originalState)
-      }
-
-      if(strict){
-        store.commit(mutationName, state)
-      }else{
-        store.replaceState(state)
+        const cookies = new Cookies(context, isClient())
+        cookies.set(filterSaveKey, storeExceptOrOnly(state, undefined, filterOnly), {path: '/'})
       }
     }
 
     this.save = (state: any, context?: INuxtContext) => {
-      this.clear()
       const {cookie, session, local} = filters()
       const cookies = new Cookies(context, isClient())
       if(cookie && cookies){
@@ -171,9 +211,12 @@ export default class VuexStorage<S extends any> {
     }
 
     this.nuxtServerInit = (actionContext: ActionContext<S, S>, nuxtContext: INuxtContext) => {
+      this.restoreFilter(nuxtContext)
       if(restore){
         this.restore(nuxtContext)
       }
+      this.clear()
+      this.saveFilter(this._store.state, nuxtContext)
       this.save(this._store.state, nuxtContext)
     }
 
@@ -183,13 +226,17 @@ export default class VuexStorage<S extends any> {
       }
       this._store = store
       const plugin = (store: Store<S>) => {
+        this.restoreFilter()
         // restore state
         if(restore){
           this.restore()
         }
-
+        this.clear()
+        this.saveFilter(store.state)
         this.save(store.state)
         store.subscribe((mutation, state) => {
+          this.clear()
+          this.saveFilter(state)
           this.save(state)
         })
       }

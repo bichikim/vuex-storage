@@ -26,8 +26,9 @@ module.exports = {
       }
     },
     {
-      files: ['*.spec.js'],
+      files: ['*.spec.js', '*.spec.ts'],
       rules: {
+        'max-lines': 'off',
         'no-magic-numbers': 'off',
         'max-nested-callbacks': 'off',
         'no-undef': 'off',

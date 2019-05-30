@@ -24,7 +24,7 @@ export interface IFilters {
   local?: IFilterOptions
 }
 
-export type DynamicFilterFn<S> = (store: Store<S>, options: IVuexStorageOptions<S>) => IFilters
+// export type DynamicFilterFn<S> = (store: Store<S>, options: IVuexStorageOptions<S>) => IFilters
 
 export interface IDynamicFilterObj {
   /**
@@ -45,36 +45,47 @@ export interface IDynamicFilterObj {
 
 export interface IVuexStorageOptions<S> {
 
+  filterSaveMethod?: 'cookie' | 'localStorage'
+  filterSaveKey?: string
+
   /**
    * override cookie, session and local by state
    */
-  filter?: DynamicFilterFn<S> | IDynamicFilterObj
+  filter?: IDynamicFilterObj
 
   /**
    * restore data from client storage
    */
   restore?: boolean
+
   /**
    * supporting vuex strict
    */
   strict?: boolean
+
   /**
    * override storage data to state
    * @default false
    */
   storageFirst?: boolean
+
   key?: string
+
   mutationName?: string
+
   clientSide?: ((store: Store<S>, options: IVuexStorageOptions<S>) => boolean) | boolean
+
   /**
    * @deprecated
    */
   isRun?: boolean
+
   /**
    * @deprecated
    * please use restore
    */
   isRestore?: boolean
+
   /**
    * @deprecated
    * please use strict
