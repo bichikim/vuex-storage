@@ -17,8 +17,7 @@
     "allowJs": false,
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "declaration": true,
-    "declarationDir": "declarations",
+
     "sourceMap": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
