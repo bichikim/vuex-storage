@@ -121,6 +121,8 @@ define("index", ["require", "exports", "lodash", "cookie"], function (require, e
     Object.defineProperty(exports, "__esModule", { value: true });
     cookie_1 = __importDefault(cookie_1);
     exports.DEFAULT_KEY = 'vuex';
+    exports.FILTERS_KEY = 'vuex-filters';
+    exports.DEFAULT_SAVE_METHOD = 'localStorage';
     exports.DEFAULT_MUTATION_NAME = '__RESTORE_MUTATION';
     // saving mutation name
     function storeExceptOrOnly(_state, except, only) {
@@ -144,7 +146,7 @@ define("index", ["require", "exports", "lodash", "cookie"], function (require, e
         function VuexStorage(options) {
             var _this = this;
             if (options === void 0) { options = {}; }
-            var _a = options.restore, restore = _a === void 0 ? true : _a, _b = options.strict, strict = _b === void 0 ? false : _b, _c = options.key, key = _c === void 0 ? exports.DEFAULT_KEY : _c, _d = options.mutationName, mutationName = _d === void 0 ? exports.DEFAULT_MUTATION_NAME : _d, _e = options.storageFirst, storageFirst = _e === void 0 ? true : _e, dynamicFilter = options.filter, clientSide = options.clientSide;
+            var _a = options.restore, restore = _a === void 0 ? true : _a, _b = options.strict, strict = _b === void 0 ? false : _b, _c = options.key, key = _c === void 0 ? exports.DEFAULT_KEY : _c, _d = options.mutationName, mutationName = _d === void 0 ? exports.DEFAULT_MUTATION_NAME : _d, _e = options.storageFirst, storageFirst = _e === void 0 ? true : _e, dynamicFilter = options.filter, clientSide = options.clientSide, _f = options.filterSaveKey, filterSaveKey = _f === void 0 ? exports.FILTERS_KEY : _f, _g = options.filterSaveMethod, filterSaveMethod = _g === void 0 ? exports.DEFAULT_SAVE_METHOD : _g;
             var isClient = function () {
                 if (typeof clientSide === 'function') {
                     return clientSide(_this._store, options);
@@ -156,18 +158,16 @@ define("index", ["require", "exports", "lodash", "cookie"], function (require, e
             };
             var getStateFilter = function (dynamicFilter) {
                 return {
-                    cookie: _this._store.state[dynamicFilter.cookie],
-                    session: _this._store.state[dynamicFilter.session],
-                    local: _this._store.state[dynamicFilter.local],
+                    cookie: lodash_2.get(_this._store.state, dynamicFilter.cookie),
+                    session: lodash_2.get(_this._store.state, dynamicFilter.session),
+                    local: lodash_2.get(_this._store.state, dynamicFilter.local),
                 };
             };
             var filters = function () {
                 if (!dynamicFilter) {
                     return {};
                 }
-                return typeof dynamicFilter === 'function' ?
-                    dynamicFilter(_this._store, options) :
-                    getStateFilter(dynamicFilter);
+                return getStateFilter(dynamicFilter);
             };
             this.mutationName = mutationName;
             this.mutation = function (state, payload) {
@@ -187,6 +187,39 @@ define("index", ["require", "exports", "lodash", "cookie"], function (require, e
                 sessionStorage.setItem(key, '{}');
                 localStorage.setItem(key, '{}');
             };
+            var mergeState = function (state) {
+                var store = _this._store;
+                var _state = state;
+                var originalState = lodash_2.cloneDeep(store.state);
+                if (storageFirst) {
+                    _state = lodash_2.merge(originalState, state);
+                }
+                else {
+                    _state = lodash_2.merge(state, originalState);
+                }
+                if (strict) {
+                    store.commit(mutationName, _state);
+                }
+                else {
+                    store.replaceState(_state);
+                }
+            };
+            this.restoreFilter = function (context) {
+                var store = _this._store;
+                var localState = {};
+                var cookieState = {};
+                if (filterSaveMethod === 'localStorage') {
+                    if (!isClient()) {
+                        return;
+                    }
+                    localState = JSON.parse(localStorage.getItem(filterSaveKey) || '{}');
+                }
+                else {
+                    var cookies = new cookie_1.default(context, isClient());
+                    cookieState = cookies.get(filterSaveKey);
+                }
+                mergeState(lodash_2.merge(localState, cookieState));
+            };
             this.restore = function (context) {
                 var store = _this._store;
                 var cookieState = {};
@@ -199,37 +232,37 @@ define("index", ["require", "exports", "lodash", "cookie"], function (require, e
                 var localState = {};
                 // get client storage data if it is client side
                 if (isClient()) {
-                    var sessionStorage_1 = window.sessionStorage, localStorage_1 = window.localStorage;
                     var sessionData = '{}';
                     var localData = '{}';
                     if (session) {
-                        sessionData = sessionStorage_1.getItem(key)
+                        sessionData = sessionStorage.getItem(key)
                             || /* istanbul ignore next: tired of writing tests */ '{}';
                         sessionState = storeExceptOrOnly(JSON.parse(sessionData), session.except, session.only);
                     }
                     if (local) {
-                        localData = localStorage_1.getItem(key)
+                        localData = localStorage.getItem(key)
                             || /* istanbul ignore next: tired of writing tests */ '{}';
                         localState = storeExceptOrOnly(JSON.parse(localData), local.except, local.only);
                     }
                 }
-                var state = lodash_2.merge(sessionState, localState, cookieState);
-                var originalState = lodash_2.cloneDeep(store.state);
-                if (storageFirst) {
-                    state = lodash_2.merge(originalState, state);
+                mergeState(lodash_2.merge(sessionState, localState, cookieState));
+            };
+            this.saveFilter = function (state, context) {
+                var filterOnly = dynamicFilter ?
+                    [dynamicFilter.local, dynamicFilter.cookie, dynamicFilter.session] :
+                    undefined;
+                if (filterSaveMethod === 'localStorage') {
+                    if (!isClient()) {
+                        return;
+                    }
+                    localStorage.setItem(filterSaveKey, JSON.stringify(storeExceptOrOnly(state, undefined, filterOnly)));
                 }
                 else {
-                    state = lodash_2.merge(state, originalState);
-                }
-                if (strict) {
-                    store.commit(mutationName, state);
-                }
-                else {
-                    store.replaceState(state);
+                    var cookies = new cookie_1.default(context, isClient());
+                    cookies.set(filterSaveKey, storeExceptOrOnly(state, undefined, filterOnly), { path: '/' });
                 }
             };
             this.save = function (state, context) {
-                _this.clear();
                 var _a = filters(), cookie = _a.cookie, session = _a.session, local = _a.local;
                 var cookies = new cookie_1.default(context, isClient());
                 if (cookie && cookies) {
@@ -249,9 +282,12 @@ define("index", ["require", "exports", "lodash", "cookie"], function (require, e
                 }
             };
             this.nuxtServerInit = function (actionContext, nuxtContext) {
+                _this.restoreFilter(nuxtContext);
                 if (restore) {
                     _this.restore(nuxtContext);
                 }
+                _this.clear();
+                _this.saveFilter(_this._store.state, nuxtContext);
                 _this.save(_this._store.state, nuxtContext);
             };
             this.plugin = function (store) {
@@ -260,12 +296,17 @@ define("index", ["require", "exports", "lodash", "cookie"], function (require, e
                 }
                 _this._store = store;
                 var plugin = function (store) {
+                    _this.restoreFilter();
                     // restore state
                     if (restore) {
                         _this.restore();
                     }
+                    _this.clear();
+                    _this.saveFilter(store.state);
                     _this.save(store.state);
                     store.subscribe(function (mutation, state) {
+                        _this.clear();
+                        _this.saveFilter(state);
                         _this.save(state);
                     });
                 };

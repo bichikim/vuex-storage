@@ -20,7 +20,6 @@ export interface IFilters {
      */
     local?: IFilterOptions;
 }
-export declare type DynamicFilterFn<S> = (store: Store<S>, options: IVuexStorageOptions<S>) => IFilters;
 export interface IDynamicFilterObj {
     /**
      * cookie storage filter option state name
@@ -36,10 +35,12 @@ export interface IDynamicFilterObj {
     local?: string;
 }
 export interface IVuexStorageOptions<S> {
+    filterSaveMethod?: 'cookie' | 'localStorage';
+    filterSaveKey?: string;
     /**
      * override cookie, session and local by state
      */
-    filter?: DynamicFilterFn<S> | IDynamicFilterObj;
+    filter?: IDynamicFilterObj;
     /**
      * restore data from client storage
      */
