@@ -5,20 +5,21 @@ import {Store} from 'vuex'
 export interface IFilterOptions {
   except?: string[]
   only?: string[]
+  // cookie filter option only
   options?: CookieSerializeOptions
 }
 
 export interface IFilters {
   /**
-   * cookie storage
+   * cookie storage filter option
    */
   cookie?: IFilterOptions
   /**
-   * session storage
+   * session storage filter option
    */
   session?: IFilterOptions
   /**
-   * local storage
+   * local storage filter option
    */
   local?: IFilterOptions
 }
@@ -26,8 +27,19 @@ export interface IFilters {
 export type DynamicFilterFn<S> = (store: Store<S>, options: IVuexStorageOptions<S>) => IFilters
 
 export interface IDynamicFilterObj {
+  /**
+   * cookie storage filter option state name
+   */
   cookie?: string
+
+  /**
+   * session storage filter option state name
+   */
   session?: string
+
+  /**
+   * local storage filter option state name
+   */
   local?: string
 }
 

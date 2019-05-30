@@ -545,7 +545,7 @@ describe('vuex-storage', () => {
       expect(store.state.deepCookieTest.foo).to.equal(null)
       expect(store.state.deepCookieTest.bar).to.equal('bar')
     })
-    it('should restore Nuxt', function test() {
+    it('should restore after calling onNuxtReady', function test() {
       let _callback: any
       window.onNuxtReady = (callback) => {
         _callback = callback

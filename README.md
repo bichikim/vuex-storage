@@ -18,23 +18,61 @@ import Vuex from 'vuex'
 import VuexStorage from './src'
 Vue.use(Vuex)
 const vuexStorage = new VuexStorage({
-  local: {
-    expect: [],
-    only: [],
-  },
-  session: {
-    expect: [],
-    only: [],
+  // set Filter state paths to save state
+  filter: {
+    cookie: '__cookie', // store.state.__cookie for saving cookie
+    local: '__local', // store.state.__cookie for saving localStorage
+    session: '__session', // store.state.__cookie for saving sessionStorage
   },
 })
 const store = new Vuex.Store({
   state: {
-    
+    projectName: 'foo',
+    version: '0.0.0',
+  },
+  modules: {
+    auth: {
+      state: {
+        name: 'foo',
+        email: 'foo@foo.com',
+        link: 'https://www.foo.com',
+      }
+    },
+    __cookie: {
+      namespaced: true,
+      only: ['projectName'],
+      mutations: {
+        saveOnly(state, payload){
+          state.only = payload
+        }
+      }
+    },
+    __local: {
+      // deep targeting
+      except: ['auth.email'] // except store.state.auth.email state 
+    },
+    __session: {
+      only: ['auth', 'projectName'], // only store.state.au
+      except: ['auth.link'] // except store.state.auth.link state
+    }
   },
   plugins: [
     vuexStorage.plugin
   ]
 })
+
+/**
+ * vuexStorage is going to save like below
+ * cookie = {projectName: 'foo'}
+ * localStorage = {projectName: 'foo', version: '0.0.0', auth: {name: 'foo', link: 'https://www.foo.com'}}
+ * sessionStorage = {projectName: 'foo', auth: {name: 'foo', email: 'foo@foo.com'}}
+**/
+
+store.commit('__cookie/saveOnly', ['projectName', 'email'])
+/**
+* after changing store.state.__cookie.only
+* cookie is going to be {projectName: 'foo', version: '0.0.0'}
+**/
 ```
 ### Supporting strict mode
 Only vuex can set its state by mutation in strict mode
@@ -46,56 +84,41 @@ Vue.use(Vuex)
 const vuexStorage = new VuexStorage({
   // you can set your own mutation name
   // mutationName: '__myMutationName'
-  local: {
-    expect: [],
-      only: [],
-    },
-  session: {
-    expect: [],
-    only: [],
+  filter: {
+    cookie: '__cookie', // store.state.__cookie for saving cookie
+    local: '__local', // store.state.__cookie for saving localStorage
+    session: '__session', // store.state.__cookie for saving sessionStorage
   },
+  
+  // must set strict to be true
+   strict: true,
 })
 const store = new Vuex.Store({
   strict: true,
   state: {
-    
+    // ...
+  },
+
+  mutations: {
+    // must set this vuexStorage mutation here
+    [vuexStorage.mutationName]: vuexStorage.mutation
   },
   plugins: [
     vuexStorage.plugin
   ],
-  mutations: {
-    // must set this vuexStorage mutation here
-    [vuexStorage.mutationName]: vuexStorage.mutation
-  }
 })
 
 ```
 
 ### Supporting nuxt
-VuexStorage will wait nuxt is ready (window.onNuxtReady)
-Supporting strict mode (nuxt will set vuex strict = true)
 ```javascript
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VuexStorage from './src'
 Vue.use(Vuex)
 const vuexStorage = new VuexStorage({
-  // you can set your own mutation name
-  // mutationName: '__myMutationName'
-  // only run in client side
-  isRun: process.client,
-  local: {
-    expect: [],
-      only: [],
-    },
-  session: {
-    expect: [],
-    only: [],
-  },
-  cookie: {
-    except: [],
-    only: [],
-  }
+  clientSide: false, // or (store, options) => (false)
+  strict: true,
 })
 const store = new Vuex.Store({
   strict: true,
@@ -105,42 +128,27 @@ const store = new Vuex.Store({
   plugins: [
     vuexStorage.plugin
   ],
+  actions: {
+    // nuxt init with req.headers.cookie
+    nuxtServerInit(store, context) {
+      vuexStorage.nuxtServerInit(store, context)
+    },
+  },
   mutations: {
     // must set this vuexStorage mutation here
     [vuexStorage.mutationName]: vuexStorage.mutation
   }
 })
 
-```
+/**
+* restoring state from storage is going to wait for onNuxtReady calling
+**/
 
-### Storage deep targeting
-You can set data what you are going to save
- 
-```javascript
-import VuexStorage from './src'
-new VuexStorage({
-  // for localStorage
-  local: {
-    // only where in list below to save
-    only: ['auth'],
-    // except where in list below to save
-    except: ['auth.access-token'],
-  },
-  session: {
-    // only where in list below to save
-    only: [],
-    // except where in list below to save
-    except: ['auth'],
-  },
-  cookie: {
-    except: [],
-    only: ['auth.access-token'],
-  }
-})
+
 ```
 
 ### Storage first mode
-Prohibit override defined data
+Prohibit override defined state
 
 ```javascript
 import VuexStorage from './src'
@@ -150,13 +158,8 @@ new VuexStorage({
 })
 ```
 
-### Dynamic filtering
+## VuexStorage Options
+Refer to src/types.ts interface IVuexStorageOptions
 
-```javascript
-import VuexStorage from './src'
-new VuexStorage({
-  
-})
-```
 
 
