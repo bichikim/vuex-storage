@@ -1,3 +1,14 @@
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -40,7 +51,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
             configurable: true
         });
         Cookies.prototype.get = function (name, options) {
-            this._updateCookie();
+            this._updateCookie(options);
             var data = this._cookies[name];
             try {
                 return JSON.parse(data);
@@ -51,7 +62,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
         };
         Cookies.prototype.remove = function (name, options) {
             delete this._cookies[name];
-            this._saveCookie(name, '', options);
+            this._saveCookie(name, undefined, options);
         };
         Cookies.prototype.set = function (name, value, options) {
             var _value = value;
@@ -61,51 +72,46 @@ var __importStar = (this && this.__importStar) || function (mod) {
             this._cookies[name] = value;
             this._saveCookie(name, _value, options);
         };
-        Cookies.prototype._updateCookie = function () {
+        Cookies.prototype._updateCookie = function (options) {
             if (this.isClient) {
-                this._cookies = cookie.parse(document.cookie);
+                this._cookies = cookie.parse(document.cookie, options);
                 return;
             }
             this._cookies = {};
             var _req = this._req;
-            if (_req && _req.headers) {
-                var _cookie_1 = _req.headers.cookie || _req.cookies;
+            if (_req && (_req.cookies || _req.headers)) {
+                var _cookie_1 = _req.cookies || _req.headers.cookie;
                 if (typeof _cookie_1 === 'object') {
-                    this._cookies = _cookie_1;
+                    this._cookies = __assign({}, _cookie_1);
                 }
                 else {
-                    this._cookies = cookie.parse(_cookie_1);
+                    this._cookies = cookie.parse(_cookie_1, options);
                 }
             }
             var _res = this._res;
             var _cookie = _res && _res.getHeader(SET_COOKIE);
             if (_cookie) {
-                this._cookies = lodash_1.merge(this._cookies, cookie.parse(_cookie.toString()));
+                this._cookies = lodash_1.merge(this._cookies, cookie.parse(_cookie.toString(), options));
             }
         };
         Cookies.prototype._saveCookie = function (name, value, options) {
-            var cookieData = cookie.serialize(name, value || '', options);
+            if (value === void 0) { value = ''; }
             if (this.isClient) {
-                document.cookie = cookieData;
+                document.cookie = cookie.serialize(name, value, options);
                 return;
             }
-            var _a = this, _req = _a._req, _res = _a._res;
+            var _res = this._res;
             if (_res) {
                 var regex_1 = new RegExp("^" + name + "=");
-                var rawCookie = _res.getHeader(SET_COOKIE);
-                var cookies_1 = [];
-                if (rawCookie) {
-                    rawCookie.toString().split(';')
-                        .forEach(function (value) {
-                        if (!regex_1.test(value)) {
-                            cookies_1.push(value);
-                        }
-                    });
-                }
-                if (value) {
-                    cookies_1.push(cookieData);
-                }
-                _res.setHeader(SET_COOKIE, cookies_1.join('; '));
+                var rawCookie = _res.getHeader(SET_COOKIE) || '';
+                var cookies = rawCookie
+                    .toString()
+                    .split(';')
+                    .filter(function (value) {
+                    return !regex_1.test(value);
+                });
+                cookies.push(cookie.serialize(name, value, options));
+                _res.setHeader(SET_COOKIE, cookies.join('; '));
             }
         };
         return Cookies;

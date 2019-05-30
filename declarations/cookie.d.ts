@@ -8,13 +8,12 @@ export { CookieSerializeOptions } from 'cookie';
 export default class Cookies {
     private _res?;
     private _req?;
-    private _isNuxt;
     private _cookies;
-    private _isClient;
+    private readonly _isClient;
     private _init;
     constructor(options?: ICookieOptions, isClient?: boolean);
     readonly isClient: boolean;
-    get(name: string, options?: cookie.CookieSerializeOptions): any;
+    get(name: string, options?: cookie.CookieParseOptions): any;
     remove(name: string, options?: cookie.CookieSerializeOptions): void;
     set(name: string, value: object | string, options?: cookie.CookieSerializeOptions): void;
     private _updateCookie;

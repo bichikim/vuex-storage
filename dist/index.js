@@ -25,30 +25,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     Object.defineProperty(exports, "__esModule", { value: true });
     var lodash_1 = require("lodash");
     var cookie_1 = __importDefault(require("./cookie"));
+    exports.DEFAULT_KEY = 'vuex';
+    exports.DEFAULT_MUTATION_NAME = '__RESTORE_MUTATION';
     // saving mutation name
     function storeExceptOrOnly(_state, except, only) {
         var state = lodash_1.cloneDeep(_state);
         var clonedState = {};
-        if (except) {
-            clonedState = lodash_1.omit(state, except);
+        if (!only && !except) {
+            return clonedState;
+        }
+        if (only) {
+            clonedState = lodash_1.pick(state, only);
         }
         else {
             clonedState = state;
         }
-        if (only) {
-            clonedState = lodash_1.pick(clonedState, only);
+        if (except) {
+            clonedState = lodash_1.omit(clonedState, except);
         }
         return clonedState;
     }
     var VuexStorage = /** @class */ (function () {
         function VuexStorage(options) {
-            if (options === void 0) { options = {}; }
             var _this = this;
-            var cookie = options.cookie, _a = options.restore, restore = _a === void 0 ? true : _a, isRun = options.isRun, _b = options.strict, strict = _b === void 0 ? false : _b, _c = options.key, key = _c === void 0 ? 'vuex' : _c, local = options.local, _d = options.mutationName, mutationName = _d === void 0 ? '__RESTORE_MUTATION' : _d, session = options.session, _e = options.storageFirst, storageFirst = _e === void 0 ? true : _e, clientSide = options.clientSide;
-            /* istanbul ignore if */
-            if (isRun) {
-                console.warn('please do not use the isRun option');
-            }
+            if (options === void 0) { options = {}; }
+            var _a = options.restore, restore = _a === void 0 ? true : _a, _b = options.strict, strict = _b === void 0 ? false : _b, _c = options.key, key = _c === void 0 ? exports.DEFAULT_KEY : _c, _d = options.mutationName, mutationName = _d === void 0 ? exports.DEFAULT_MUTATION_NAME : _d, _e = options.storageFirst, storageFirst = _e === void 0 ? true : _e, dynamicFilter = options.filter, clientSide = options.clientSide;
             var isClient = function () {
                 if (typeof clientSide === 'function') {
                     return clientSide(_this._store, options);
@@ -57,6 +58,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
                     return clientSide;
                 }
                 return typeof document === 'object';
+            };
+            var getStateFilter = function (dynamicFilter) {
+                return {
+                    cookie: _this._store.state[dynamicFilter.cookie],
+                    session: _this._store.state[dynamicFilter.session],
+                    local: _this._store.state[dynamicFilter.local],
+                };
+            };
+            var filters = function () {
+                if (!dynamicFilter) {
+                    return {};
+                }
+                return typeof dynamicFilter === 'function' ?
+                    dynamicFilter(_this._store, options) :
+                    getStateFilter(dynamicFilter);
             };
             this.mutationName = mutationName;
             this.mutation = function (state, payload) {
@@ -79,22 +95,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
             this.restore = function (context) {
                 var store = _this._store;
                 var cookieState = {};
+                var _a = filters(), cookie = _a.cookie, session = _a.session, local = _a.local;
                 if (cookie) {
                     var cookies = new cookie_1.default(context, isClient());
                     cookieState = storeExceptOrOnly(cookies.get(key), cookie.except, cookie.only);
                 }
                 var sessionState = {};
                 var localState = {};
+                // get client storage data if it is client side
                 if (isClient()) {
                     var sessionStorage_1 = window.sessionStorage, localStorage_1 = window.localStorage;
                     var sessionData = '{}';
                     var localData = '{}';
                     if (session) {
-                        sessionData = sessionStorage_1.getItem(key) || '{}';
+                        sessionData = sessionStorage_1.getItem(key)
+                            || /* istanbul ignore next: tired of writing tests */ '{}';
                         sessionState = storeExceptOrOnly(JSON.parse(sessionData), session.except, session.only);
                     }
                     if (local) {
-                        localData = localStorage_1.getItem(key) || '{}';
+                        localData = localStorage_1.getItem(key)
+                            || /* istanbul ignore next: tired of writing tests */ '{}';
                         localState = storeExceptOrOnly(JSON.parse(localData), local.except, local.only);
                     }
                 }
@@ -115,9 +135,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
             };
             this.save = function (state, context) {
                 _this.clear();
+                var _a = filters(), cookie = _a.cookie, session = _a.session, local = _a.local;
                 var cookies = new cookie_1.default(context, isClient());
                 if (cookie && cookies) {
-                    var _a = cookie.options, options_1 = _a === void 0 ? {} : _a;
+                    /* istanbul ignore next */
+                    var _b = cookie.options, options_1 = _b === void 0 ? {} : _b;
                     cookies.set(key, storeExceptOrOnly(state, cookie.except, cookie.only), __assign({ path: '/' }, options_1));
                 }
                 if (!isClient()) {
