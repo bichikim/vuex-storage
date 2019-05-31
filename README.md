@@ -20,8 +20,8 @@ const vuexStorage = new VuexStorage({
   // set Filter state paths to save state
   filter: {
     cookie: '__cookie', // store.state.__cookie for saving cookie
-    local: '__local', // store.state.__cookie for saving localStorage
-    session: '__session', // store.state.__cookie for saving sessionStorage
+    local: '__local', // store.state.__local for saving localStorage
+    session: '__session', // store.state.__session for saving sessionStorage
   },
 })
 const store = new Vuex.Store({
@@ -84,9 +84,10 @@ const vuexStorage = new VuexStorage({
   // you can set your own mutation name
   // mutationName: '__myMutationName'
   filter: {
-    cookie: '__cookie', // store.state.__cookie for saving cookie
-    local: '__local', // store.state.__cookie for saving localStorage
-    session: '__session', // store.state.__cookie for saving sessionStorage
+    // deep path
+    cookie: 'filter.cookie', // store.state.filter.cookie for saving cookie
+    local: 'filter.local', // store.state.filter.local for saving localStorage
+    session: 'filter.session', // store.state.filter.session for saving sessionStorage
   },
   
   // must set strict to be true
