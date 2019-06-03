@@ -152,7 +152,7 @@ Prohibit override defined state
 ```javascript
 import VuexStorage from './src'
 new VuexStorage({
-  storageFirst: true,
+  storageFirst: false,
   session: {},
 })
 ```
