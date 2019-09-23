@@ -18,10 +18,11 @@ import VuexStorage from './src'
 Vue.use(Vuex)
 const vuexStorage = new VuexStorage({
   // set Filter state paths to save state
+  // filter can be changed in running time (This is a very shining feature of This library)
   filter: {
-    cookie: '__cookie', // store.state.__cookie for saving cookie
-    local: '__local', // store.state.__local for saving localStorage
-    session: '__session', // store.state.__session for saving sessionStorage
+    cookie: '__cookie', // set a filter state state path to save cookie
+    local: '__local', // set a filter store.state.__local to save localStorage
+    session: '__session', // set a filter store.state.__session to save sessionStorage
   },
 })
 const store = new Vuex.Store({
@@ -37,6 +38,7 @@ const store = new Vuex.Store({
         link: 'https://www.foo.com',
       }
     },
+    // cookie filter
     __cookie: {
       namespaced: true,
       only: ['projectName'],
@@ -46,16 +48,19 @@ const store = new Vuex.Store({
         }
       }
     },
+    // local filter
     __local: {
       // deep targeting
       except: ['auth.email'] // except store.state.auth.email state 
     },
+    // session filter
     __session: {
-      only: ['auth', 'projectName'], // only store.state.au
+      only: ['auth', 'projectName'], // only store.state.auth and store.state.projectName
       except: ['auth.link'] // except store.state.auth.link state
     }
   },
   plugins: [
+    // please register this plugin
     vuexStorage.plugin
   ]
 })
@@ -67,14 +72,14 @@ const store = new Vuex.Store({
  * sessionStorage = {projectName: 'foo', auth: {name: 'foo', email: 'foo@foo.com'}}
 **/
 
-store.commit('__cookie/saveOnly', ['projectName', 'email'])
 /**
 * after changing store.state.__cookie.only
 * cookie is going to be {projectName: 'foo', version: '0.0.0'}
 **/
+store.commit('__cookie/saveOnly', ['projectName', 'email'])
+
 ```
 ### Supporting strict mode
-Only vuex can set its state by mutation in strict mode
 ```javascript
 import Vue from 'vue'
 import Vuex from 'vuex'
@@ -90,7 +95,7 @@ const vuexStorage = new VuexStorage({
     session: 'filter.session', // store.state.filter.session for saving sessionStorage
   },
   
-  // must set strict to be true
+  // you should set strict to be true
    strict: true,
 })
 const store = new Vuex.Store({
@@ -100,7 +105,8 @@ const store = new Vuex.Store({
   },
 
   mutations: {
-    // must set this vuexStorage mutation here
+    // you should set this vuex-storage mutation here.
+    // because in the vuex-storage, a restore state function will use the below mutation
     [vuexStorage.mutationName]: vuexStorage.mutation
   },
   plugins: [
@@ -129,13 +135,13 @@ const store = new Vuex.Store({
     vuexStorage.plugin
   ],
   actions: {
-    // nuxt init with req.headers.cookie
+    // nuxt will init with req.headers.cookie
     nuxtServerInit(store, context) {
       vuexStorage.nuxtServerInit(store, context)
     },
   },
   mutations: {
-    // must set this vuexStorage mutation here
+    // you must set this vuexStorage mutation here
     [vuexStorage.mutationName]: vuexStorage.mutation
   }
 })
