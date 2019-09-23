@@ -2,12 +2,8 @@
   "extends": [
     "tslint:recommended"
   ],
-  "linterOptions": {
-    "exclude": [
-      "declarations"
-    ]
-  },
   "jsRules": true,
+  "defaultSeverity": "warning",
   "rules": {
     "class-name": true,
     "curly": true,
@@ -24,6 +20,7 @@
       "timeEnd",
       "trace"
     ],
+    "object-literal-key-quotes": false,
     "no-construct": true,
     "prefer-const": false,
     "no-debugger": true,
@@ -32,7 +29,7 @@
     "no-eval": true,
     "no-require-imports": true,
     "no-string-literal": true,
-    "trailing-comma": [false, {
+    "trailing-comma": [true, {
       "multiline": "always",
       "singleline": "never"
     }],
@@ -41,8 +38,9 @@
     "quotemark": [true, "single"],
     "type-literal-delimiter": false,
     "radix": true,
-    "only-arrow-functions": [true, "allow-named-functions"],
+    "only-arrow-functions": [false],
     "no-empty-interface": false,
+    "interface-name": false,
     "no-string-throw": true,
     "semicolon": [true, "never"],
     "triple-equals": [true, "allow-null-check"],
@@ -78,7 +76,7 @@
     "max-classes-per-file": [false, 1],
     "object-literal-sort-keys": false,
     "space-before-function-paren": [true, {
-      "anonymous": "never",
+      "anonymous": "always",
       "named": "never",
       "asyncArrow": "always",
       "constructor": "never",

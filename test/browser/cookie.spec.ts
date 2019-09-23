@@ -1,6 +1,6 @@
+import Cookie from '@/cookie'
 import {expect} from 'chai'
 import * as cookieModule from 'cookie'
-import Cookie from './cookie'
 
 describe('cookie', function test() {
   describe('cookie in browser', () => {
