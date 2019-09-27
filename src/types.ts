@@ -14,15 +14,15 @@ export interface ICookieFilterOptions extends IFilterOptions{
 
 export interface IFilters {
   /**
-   * cookie storage filter option
+   * Cookie storage filter option
    */
   cookie?: ICookieFilterOptions
   /**
-   * session storage filter option
+   * Session storage filter option
    */
   session?: IFilterOptions
   /**
-   * local storage filter option
+   * Local storage filter option
    */
   local?: IFilterOptions
 }
@@ -31,17 +31,17 @@ export interface IFilters {
 
 export interface IDynamicFilterObj {
   /**
-   * cookie storage filter option state name
+   * Cookie storage filter option state name
    */
   cookie?: string
 
   /**
-   * session storage filter option state name
+   * Session storage filter option state name
    */
   session?: string
 
   /**
-   * local storage filter option state name
+   * Local storage filter option state name
    */
   local?: string
 }
@@ -52,22 +52,22 @@ export interface IVuexStorageOptions<S> {
   filterSaveKey?: string
 
   /**
-   * override cookie, session and local by state
+   * Override cookie, session and local by state
    */
   filter?: IDynamicFilterObj
 
   /**
-   * restore data from client storage
+   * Restore data from client storage
    */
   restore?: boolean
 
   /**
-   * supporting vuex strict
+   * Supporting vuex strict
    */
   strict?: boolean
 
   /**
-   * override storage data to state
+   * Override storage data to state
    * @default false
    */
   storageFirst?: boolean

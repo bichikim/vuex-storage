@@ -1,7 +1,7 @@
 import {cloneDeep, get, merge, omit, pick} from 'lodash'
-import {ActionContext, Mutation, Store} from 'vuex'
-import {Plugin} from 'vuex'
-import Cookies, {CookieSerializeOptions} from './cookie'
+import {ActionContext, Mutation, Plugin, Store} from 'vuex'
+
+import Cookies from './cookie'
 import {IDynamicFilterObj, IFilters, INuxtContext, IVuexStorageOptions} from './types'
 
 export const DEFAULT_KEY = 'vuex'
@@ -13,15 +13,15 @@ export const DEFAULT_MUTATION_NAME = '__RESTORE_MUTATION'
 function storeExceptOrOnly(_state: any, except?: string[], only?: string[]): any {
   const state = cloneDeep(_state)
   let clonedState = {}
-  if(!only && !except){
+  if(!only && !except) {
     return clonedState
   }
-  if(only){
+  if(only) {
     clonedState = pick(state, only)
-  }else{
+  } else {
     clonedState = state
   }
-  if(except){
+  if(except) {
     clonedState = omit(clonedState, except)
   }
 
@@ -47,17 +47,17 @@ export default class VuexStorage<S extends any> {
       key = DEFAULT_KEY,
       mutationName = DEFAULT_MUTATION_NAME,
       storageFirst = true,
-      filter: dynamicFilter,
+      filter: dynamicFilter = {},
       clientSide,
       filterSaveKey = FILTERS_KEY,
       filterSaveMethod = DEFAULT_SAVE_METHOD,
     } = options
 
     const isClient = (): boolean => {
-      if(typeof clientSide === 'function'){
+      if(typeof clientSide === 'function') {
         return clientSide(this._store, options)
       }
-      if(typeof clientSide === 'boolean'){
+      if(typeof clientSide === 'boolean') {
         return clientSide
       }
       return typeof document === 'object'
@@ -65,14 +65,14 @@ export default class VuexStorage<S extends any> {
 
     const getStateFilter = (dynamicFilter: IDynamicFilterObj): IFilters => {
       return {
-        cookie: get<any, string>(this._store.state, dynamicFilter.cookie),
-        session: get<any, string>(this._store.state, dynamicFilter.session),
-        local: get<any, string>(this._store.state, dynamicFilter.local),
+        cookie: get<any, string>(this._store.state, dynamicFilter.cookie || ''),
+        session: get<any, string>(this._store.state, dynamicFilter.session || ''),
+        local: get<any, string>(this._store.state, dynamicFilter.local || ''),
       }
     }
 
     const filters = (): IFilters => {
-      if(!dynamicFilter){
+      if(!dynamicFilter) {
         return {}
       }
 
@@ -81,11 +81,11 @@ export default class VuexStorage<S extends any> {
 
     this.mutationName = mutationName
 
-    this.mutation = function(state: S, payload: any) {
+    this.mutation = function (state: S, payload: any) {
       // eslint-disable-next-line consistent-this
-      const that: any = this
+      const {_vm}: any = this
       Object.keys(payload).forEach((moduleKey: string) => {
-        that._vm.$set(state, moduleKey, payload[moduleKey])
+        _vm.$set(state, moduleKey, payload[moduleKey])
       })
     }
 
@@ -93,7 +93,9 @@ export default class VuexStorage<S extends any> {
       const cookies = new Cookies(context, isClient())
       cookies.set(key, {}, {path: '/'})
 
-      if(!isClient()){return}
+      if(!isClient()) {
+        return
+      }
       const {sessionStorage, localStorage} = window
       sessionStorage.setItem(key, '{}')
       localStorage.setItem(key, '{}')
@@ -103,29 +105,28 @@ export default class VuexStorage<S extends any> {
       const store = this._store
       let _state = state
       const originalState = cloneDeep(store.state)
-      if(storageFirst){
+      if(storageFirst) {
         _state = merge(originalState, state)
-      }else{
+      } else {
         _state = merge(state, originalState)
       }
-      if(strict){
+      if(strict) {
         store.commit(mutationName, _state)
-      }else{
+      } else {
         store.replaceState(_state)
       }
     }
 
     this.restoreFilter = (context?: INuxtContext) => {
-      const store = this._store
       let localState = {}
       let cookieState = {}
 
-      if(filterSaveMethod === 'localStorage'){
-        if(!isClient()){
+      if(filterSaveMethod === 'localStorage') {
+        if(!isClient()) {
           return
         }
         localState = JSON.parse(localStorage.getItem(filterSaveKey) || '{}')
-      }else{
+      } else {
         const cookies = new Cookies(context, isClient())
         cookieState = cookies.get(filterSaveKey)
       }
@@ -133,10 +134,9 @@ export default class VuexStorage<S extends any> {
     }
 
     this.restore = (context?: INuxtContext) => {
-      const store = this._store
       let cookieState = {}
       const {cookie, session, local} = filters()
-      if(cookie){
+      if(cookie) {
         const cookies = new Cookies(context, isClient())
         cookieState = storeExceptOrOnly(cookies.get(key), cookie.except, cookie.only)
       }
@@ -145,15 +145,15 @@ export default class VuexStorage<S extends any> {
       let localState = {}
 
       // get client storage data if it is client side
-      if(isClient()){
+      if(isClient()) {
         let sessionData = '{}'
         let localData = '{}'
-        if(session){
+        if(session) {
           sessionData = sessionStorage.getItem(key)
             || /* istanbul ignore next: tired of writing tests */ '{}'
           sessionState = storeExceptOrOnly(JSON.parse(sessionData), session.except, session.only)
         }
-        if(local){
+        if(local) {
           localData = localStorage.getItem(key)
             ||  /* istanbul ignore next: tired of writing tests */ '{}'
           localState = storeExceptOrOnly(JSON.parse(localData), local.except, local.only)
@@ -163,18 +163,26 @@ export default class VuexStorage<S extends any> {
     }
 
     this.saveFilter = (state: any, context?: INuxtContext) => {
-      const filterOnly = dynamicFilter ?
-        [dynamicFilter.local, dynamicFilter.cookie, dynamicFilter.session] :
-        undefined
-      if(filterSaveMethod === 'localStorage'){
-        if(!isClient()){
+      const filterOnly: string[] = []
+      const {local: dynamicLocal, cookie: dynamicCookie, session: dynamicSession} = dynamicFilter
+      if(dynamicLocal) {
+        filterOnly.push(dynamicLocal)
+      }
+      if(dynamicCookie) {
+        filterOnly.push(dynamicCookie)
+      }
+      if(dynamicSession) {
+        filterOnly.push(dynamicSession)
+      }
+      if(filterSaveMethod === 'localStorage') {
+        if(!isClient()) {
           return
         }
         localStorage.setItem(
           filterSaveKey,
           JSON.stringify(storeExceptOrOnly(state, undefined, filterOnly)),
         )
-      }else{
+      } else {
         const cookies = new Cookies(context, isClient())
         cookies.set(filterSaveKey, storeExceptOrOnly(state, undefined, filterOnly), {path: '/'})
       }
@@ -183,7 +191,7 @@ export default class VuexStorage<S extends any> {
     this.save = (state: any, context?: INuxtContext) => {
       const {cookie, session, local} = filters()
       const cookies = new Cookies(context, isClient())
-      if(cookie && cookies){
+      if(cookie && cookies) {
         /* istanbul ignore next */
         const {
           options = {},
@@ -198,13 +206,15 @@ export default class VuexStorage<S extends any> {
           {path: '/', ...options})
       }
 
-      if(!isClient()){return}
+      if(!isClient()) {
+        return
+      }
       const {sessionStorage, localStorage} = window
-      if(session){
+      if(session) {
         sessionStorage.setItem(key,
           JSON.stringify(storeExceptOrOnly(state, session.except, session.only)))
       }
-      if(local){
+      if(local) {
         localStorage.setItem(key,
           JSON.stringify(storeExceptOrOnly(state, local.except, local.only)))
       }
@@ -212,7 +222,7 @@ export default class VuexStorage<S extends any> {
 
     this.nuxtServerInit = (actionContext: ActionContext<S, S>, nuxtContext: INuxtContext) => {
       this.restoreFilter(nuxtContext)
-      if(restore){
+      if(restore) {
         this.restore(nuxtContext)
       }
       this.clear()
@@ -221,14 +231,14 @@ export default class VuexStorage<S extends any> {
     }
 
     this.plugin = (store: Store<S>) => {
-      if(this._store){
+      if(this._store) {
         throw new Error('plugin install twice')
       }
       this._store = store
       const plugin = (store: Store<S>) => {
         this.restoreFilter()
         // restore state
-        if(restore){
+        if(restore) {
           this.restore()
         }
         this.clear()
@@ -240,11 +250,11 @@ export default class VuexStorage<S extends any> {
           this.save(state)
         })
       }
-      if(isClient() && window.onNuxtReady){
+      if(isClient() && window.onNuxtReady) {
         window.onNuxtReady(() => (plugin(store)))
         return
       }
-      if(process.server){
+      if(process.server) {
         return
       }
       plugin(store)

@@ -1,32 +1,122 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
-    "strict": false,
+    /**************************
+     * Basic Options          *
+     **************************/
+    /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017','ES2018' or 'ESNEXT'. */
+    "target": "esnext",
+    /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
     "module": "esnext",
-    "target": "es2015",
-    "lib": [
-      "dom",
-      "es2015",
-      "esnext"
+    /* Specify library files to be included in the compilation. */
+    "lib": ["esnext", "dom"],
+    /* Allow javascript files to be compiled. */
+    "allowJs": true,
+    /* Generates corresponding '.d.ts' file. */
+    "declaration": false,
+    /* Generates corresponding '.map' file. */
+    "sourceMap": true,
+    /* Redirect output structure to the directory. */
+    "outDir": "dist",
+    /* Do not emit comments to output. */
+    "removeComments": false,
+    /* Import emit helpers from 'tslib'. */
+    "importHelpers": true,
+    /* Jsx mode */
+    "jsx": "preserve",
+
+    /********************************
+     * Strict Type-Checking Options *
+     ********************************/
+    /* Enable all strict type-checking options. */
+    "strict": false,
+    /* Raise error on expressions and declarations with an implied 'any' type. */
+    "noImplicitAny": false,
+    /* Enable strict null checks. */
+    "strictNullChecks": true,
+    /* Enable strict checking of function types. */
+    "strictFunctionTypes": true,
+    /* Enable strict checking of property initialization in classes. */
+    "strictPropertyInitialization": false,
+    /* Raise error on 'this' expressions with an implied 'any' type. */
+    "noImplicitThis": true,
+    /* Parse in strict mode and emit "use strict" for each source file. */
+    "alwaysStrict": true,
+
+    /**********************************
+     * Additional Checks              *
+     **********************************/
+    "plugins": [
+      { "name": "typescript-tslint-plugin" }
     ],
+    /* Report errors on unused locals. */
+    "noUnusedLocals": false,
+    /* Report errors on unused parameters. */
+    "noUnusedParameters": false,
+    /* Report error when not all code paths in function return a value. */
+    "noImplicitReturns": false,
+    /* Report errors for fallthrough cases in switch statement. */
+    "noFallthroughCasesInSwitch": true,
+    "suppressImplicitAnyIndexErrors": true,
+
+    /******************************
+     * Module Resolution Options  *
+     ******************************/
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@@/*": ["*"]
+    },
+    /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
+    "allowSyntheticDefaultImports": true,
+    /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+    "esModuleInterop": true,
     "typeRoots": [
       "node_modules/@types",
       "types"
     ],
+    // "types": [],
+    "forceConsistentCasingInFileNames": true,
+    /* Don't check libs typings */
+    "skipLibCheck": true,
     "noEmitHelpers": false,
-    "noImplicitAny": true,
-    "allowJs": false,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
 
-    "sourceMap": true,
-    "emitDecoratorMetadata": true,
+    /**************************
+     * Experimental Options   *
+     **************************/
+    /* Enables experimental support for ES7 decorators. */
     "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "baseUrl": "./"
+    /* Enables experimental support for emitting type metadata for decorators. */
+    "emitDecoratorMetadata": true,
+
+    /************************
+     * Source Map Options
+     ************************/
+    /* Specify the location where debugger should locate TypeScript files instead of source locations. */
+    // "sourceRoot": "./",
+    /* Specify the location where debugger should locate map files instead of generated locations. */
+    // "mapRoot": "./",
+    /* Emit a single file with source maps instead of having a separate file. */
+    // "inlineSourceMap": true,
+    /* Emit the source alongside the sourcemaps within a single file; requires '--inlineSourceMap' or '--sourceMap' to be set. */
+    // "inlineSources": true,
+
+
+    /**********************
+     * ?
+    ************************/
+    /* it will use that information to detect the least costly way to type-check and emit changes to your project. */
+    "incremental": false
+
+    // build environment
   },
   "include": [
-    "src/**/*.ts",
-    "types/**/*.d.ts"
+    "node_modules/vue-tsx-support/enable-check.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.vue"
   ],
-  "compileOnSave": false
+  "exclude": [
+  ]
 }
