@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "module": "amd",
-    "target": "es5",
+    "target": "es2015",
     "outFile": "dist/amd/index.js",
     "declarationDir": null,
     "declaration": null

@@ -13,8 +13,8 @@
     "doc": "typedoc -out ./docs ./src --media ./media",
     "test": "npm run test:unit",
     "lint": "eslint \"src/\"",
-    "test:unit": "karma start config/karma.config.js --browsers=ChromeHeadlessWithoutSecurity --single-run",
-    "test:watch": "karma start config/karma.config.js --browsers=ChromeHeadlessWithoutSecurity --auto-watch",
+    "test:unit": "karma start config/karma.config.js --browsers=ChromeHeadless --single-run",
+    "test:watch": "karma start config/karma.config.js --browsers=ChromeHeadless --auto-watch",
     "preversion": "npm run test && npm run build && npm run build:esm"
   },
   "files": [
@@ -39,7 +39,6 @@
   "homepage": "https://github.com/bichikim/vuex-storage#readme",
   "devDependencies": {
     "@babel/core": "^7.4.5",
-    "@babel/polyfill": "^7.4.4",
     "@nuxtjs/babel-preset-app": "^0.8.0",
     "@types/chai": "^4.1.6",
     "@types/express": "^4.17.0",
