@@ -125,10 +125,16 @@ export default class VuexStorage<S extends any> {
         if(!isClient()) {
           return
         }
-        localState = JSON.parse(localStorage.getItem(filterSaveKey) || '{}')
+        const filterData = localStorage.getItem(filterSaveKey)
+        if(filterData) {
+          localState = JSON.parse(localStorage.getItem(filterSaveKey) || '{}')
+        }
       } else {
         const cookies = new Cookies(context, isClient())
-        cookieState = cookies.get(filterSaveKey)
+        const filterData = cookies.get(filterSaveKey)
+        if(filterData) {
+          cookieState = filterData
+        }
       }
       mergeState(merge(localState, cookieState))
     }

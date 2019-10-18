@@ -3,8 +3,8 @@
   "version": "2.0.2-alpha",
   "description": "vuex-storage",
   "author": "bichi",
-  "main": "dist/amd/index.js",
-  "module": "dist/esm/index.js",
+  "main": "dist/bundle.umd.js",
+  "module": "dist/bundle.esm.js",
   "types": "declarations/index.d.ts",
   "license": "MIT",
   "scripts": {

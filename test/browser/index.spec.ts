@@ -693,6 +693,49 @@ describe('vuex-storage', () => {
       expect(store.state.deepCookieTest.foo).to.equal('foo')
       expect(store.state.deepCookieTest.bar).to.equal(null)
     })
+    it('should restore filter state with empty', function test() {
+      window.localStorage.setItem(filtersKey, JSON.stringify({
+        __local: {
+          only: ['localTest', 'deepLocalTest'],
+          except: ['deepLocalTest.bar'],
+        },
+        __session: {
+          only: ['sessionTest', 'deepSessionTest'],
+          except: ['deepSessionTest.bar'],
+        },
+        __cookie: {
+          only: ['cookieTest', 'deepCookieTest'],
+          except: ['deepCookieTest.bar'],
+        },
+      }))
+      const vuexStorage = new VuexStorage({
+        ...vuexStorageOptions,
+      })
+      window.localStorage.setItem(key, '')
+      cookies.set(key, {
+      }, {path: '/'})
+      const store = new Vuex.Store<any>({
+        ...cloneDeep(state),
+        plugins: [vuexStorage.plugin],
+        modules: {
+          ...state.modules,
+          __local: {},
+          __session: {},
+          __cookie: {},
+        },
+      })
+      expect(store.state.localTest).to.equal(null)
+      expect(store.state.deepLocalTest.foo).to.equal(null)
+      expect(store.state.deepLocalTest.bar).to.equal(null)
+      expect(store.state.sessionTest).to.equal('test')
+      expect(store.state.deepSessionTest.foo).to.equal('foo')
+      expect(store.state.deepSessionTest.bar).to.equal(null)
+      expect(store.state.cookieTest).to.equal(null)
+      expect(store.state.deepCookieTest.foo).to.equal(null)
+      expect(store.state.deepCookieTest.bar).to.equal(null)
+      store.commit('saveSessionTest', 'bar')
+      expect(store.state.sessionTest).to.equal('bar')
+    })
   })
   describe('save', function test() {
     const CHANGE_RESULT = 'testDone'
