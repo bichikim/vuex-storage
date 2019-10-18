@@ -1,6 +1,6 @@
 {
   "name": "vuex-storage",
-  "version": "2.0.1",
+  "version": "2.0.2-alpha",
   "description": "vuex-storage",
   "author": "bichi",
   "main": "dist/amd/index.js",
@@ -14,7 +14,7 @@
     "lint": "eslint \"src/\"",
     "test:unit": "karma start config/karma.config.js --browsers=ChromeHeadless --single-run",
     "test:watch": "karma start config/karma.config.js --browsers=ChromeHeadless --auto-watch",
-    "preversion": "npm run test && npm run build && npm run build:esm"
+    "preversion": "npm run test && npm run build && npm run build"
   },
   "files": [
     "dist",
