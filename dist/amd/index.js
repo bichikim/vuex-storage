@@ -300,7 +300,7 @@ define("index", ["require", "exports", "tslib", "lodash", "cookie"], function (r
                     window.onNuxtReady(function () { return (plugin(store)); });
                     return;
                 }
-                if (process && process.server) {
+                if (!isClient() && process && process.server) {
                     return;
                 }
                 plugin(store);

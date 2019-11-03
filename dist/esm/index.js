@@ -201,7 +201,7 @@ var VuexStorage = /** @class */ (function () {
                 window.onNuxtReady(function () { return (plugin(store)); });
                 return;
             }
-            if (process && process.server) {
+            if (!isClient() && process && process.server) {
                 return;
             }
             plugin(store);
