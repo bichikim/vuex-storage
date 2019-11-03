@@ -1,11 +1,16 @@
+import * as cookie from 'cookie'
+import {Request, Response} from 'express'
+import {merge} from 'lodash'
+
 const SET_COOKIE = 'set-cookie'
 
 export default class Cookies {
   private _res?: Response
   private _req?: Request
-  private _cookies: {[key: string]: any}
+  private _cookies: { [key: string]: any }
   private readonly _isClient: boolean
   private _init: boolean = false
+
   constructor(options: ICookieOptions = {}, isClient: boolean = true) {
     const {req, res} = options
     this._req = req
@@ -35,7 +40,11 @@ export default class Cookies {
     this._saveCookie(name, undefined, options)
   }
 
-  set(name: string, value: object | string, options?: cookie.CookieSerializeOptions) {
+  set(
+    name: string,
+    value: object | string,
+    options: cookie.CookieSerializeOptions = {sameSite: true},
+    ) {
     let _value = value
     if(typeof _value === 'object') {
       _value = JSON.stringify(value)
@@ -52,7 +61,7 @@ export default class Cookies {
     this._cookies = {}
     const {_req} = this
     if(_req && (_req.cookies || _req.headers)) {
-      const _cookie =  _req.cookies || _req.headers.cookie
+      const _cookie = _req.cookies || _req.headers.cookie
       if(typeof _cookie === 'object') {
         this._cookies = {..._cookie}
       } else {
@@ -76,11 +85,11 @@ export default class Cookies {
       const regex = new RegExp(`^${name}=`)
       const rawCookie = _res.getHeader(SET_COOKIE) || ''
       const cookies: string[] = rawCookie
-        .toString()
-        .split(';')
-        .filter((value) => {
-          return !regex.test(value)
-        })
+      .toString()
+      .split(';')
+      .filter((value) => {
+        return !regex.test(value)
+      })
       cookies.push(cookie.serialize(name, value, options))
       _res.setHeader(SET_COOKIE, cookies.join('; '))
     }
@@ -89,9 +98,6 @@ export default class Cookies {
 
 export {CookieSerializeOptions} from 'cookie'
 
-import * as cookie from 'cookie'
-import {merge} from 'lodash'
-import {Request, Response} from 'express'
 interface ICookieOptions {
   req?: Request
   res?: Response
