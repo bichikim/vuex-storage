@@ -1,28 +1,7 @@
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-define("cookie", ["require", "exports", "cookie", "lodash"], function (require, exports, cookie, lodash_1) {
+define("cookie", ["require", "exports", "tslib", "cookie", "lodash"], function (require, exports, tslib_1, cookie, lodash_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    cookie = __importStar(cookie);
+    cookie = tslib_1.__importStar(cookie);
     var SET_COOKIE = 'set-cookie';
     var Cookies = /** @class */ (function () {
         function Cookies(options, isClient) {
@@ -59,6 +38,7 @@ define("cookie", ["require", "exports", "cookie", "lodash"], function (require, 
             this._saveCookie(name, undefined, options);
         };
         Cookies.prototype.set = function (name, value, options) {
+            if (options === void 0) { options = { sameSite: true }; }
             var _value = value;
             if (typeof _value === 'object') {
                 _value = JSON.stringify(value);
@@ -76,7 +56,7 @@ define("cookie", ["require", "exports", "cookie", "lodash"], function (require, 
             if (_req && (_req.cookies || _req.headers)) {
                 var _cookie_1 = _req.cookies || _req.headers.cookie;
                 if (typeof _cookie_1 === 'object') {
-                    this._cookies = __assign({}, _cookie_1);
+                    this._cookies = tslib_1.__assign({}, _cookie_1);
                 }
                 else {
                     this._cookies = cookie.parse(_cookie_1, options);
@@ -116,10 +96,10 @@ define("types", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("index", ["require", "exports", "lodash", "cookie"], function (require, exports, lodash_2, cookie_1) {
+define("index", ["require", "exports", "tslib", "lodash", "cookie"], function (require, exports, tslib_2, lodash_2, cookie_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    cookie_1 = __importDefault(cookie_1);
+    cookie_1 = tslib_2.__importDefault(cookie_1);
     exports.DEFAULT_KEY = 'vuex';
     exports.FILTERS_KEY = 'vuex-filters';
     exports.DEFAULT_SAVE_METHOD = 'localStorage';
@@ -146,7 +126,7 @@ define("index", ["require", "exports", "lodash", "cookie"], function (require, e
         function VuexStorage(options) {
             var _this = this;
             if (options === void 0) { options = {}; }
-            var _a = options.restore, restore = _a === void 0 ? true : _a, _b = options.strict, strict = _b === void 0 ? false : _b, _c = options.key, key = _c === void 0 ? exports.DEFAULT_KEY : _c, _d = options.mutationName, mutationName = _d === void 0 ? exports.DEFAULT_MUTATION_NAME : _d, _e = options.storageFirst, storageFirst = _e === void 0 ? true : _e, dynamicFilter = options.filter, clientSide = options.clientSide, _f = options.filterSaveKey, filterSaveKey = _f === void 0 ? exports.FILTERS_KEY : _f, _g = options.filterSaveMethod, filterSaveMethod = _g === void 0 ? exports.DEFAULT_SAVE_METHOD : _g;
+            var _a = options.restore, restore = _a === void 0 ? true : _a, _b = options.strict, strict = _b === void 0 ? false : _b, _c = options.key, key = _c === void 0 ? exports.DEFAULT_KEY : _c, _d = options.mutationName, mutationName = _d === void 0 ? exports.DEFAULT_MUTATION_NAME : _d, _e = options.storageFirst, storageFirst = _e === void 0 ? true : _e, _f = options.filter, dynamicFilter = _f === void 0 ? {} : _f, clientSide = options.clientSide, _g = options.filterSaveKey, filterSaveKey = _g === void 0 ? exports.FILTERS_KEY : _g, _h = options.filterSaveMethod, filterSaveMethod = _h === void 0 ? exports.DEFAULT_SAVE_METHOD : _h;
             var isClient = function () {
                 if (typeof clientSide === 'function') {
                     return clientSide(_this._store, options);
@@ -158,9 +138,9 @@ define("index", ["require", "exports", "lodash", "cookie"], function (require, e
             };
             var getStateFilter = function (dynamicFilter) {
                 return {
-                    cookie: lodash_2.get(_this._store.state, dynamicFilter.cookie),
-                    session: lodash_2.get(_this._store.state, dynamicFilter.session),
-                    local: lodash_2.get(_this._store.state, dynamicFilter.local),
+                    cookie: lodash_2.get(_this._store.state, dynamicFilter.cookie || ''),
+                    session: lodash_2.get(_this._store.state, dynamicFilter.session || ''),
+                    local: lodash_2.get(_this._store.state, dynamicFilter.local || ''),
                 };
             };
             var filters = function () {
@@ -172,9 +152,9 @@ define("index", ["require", "exports", "lodash", "cookie"], function (require, e
             this.mutationName = mutationName;
             this.mutation = function (state, payload) {
                 // eslint-disable-next-line consistent-this
-                var that = this;
+                var _vm = this._vm;
                 Object.keys(payload).forEach(function (moduleKey) {
-                    that._vm.$set(state, moduleKey, payload[moduleKey]);
+                    _vm.$set(state, moduleKey, payload[moduleKey]);
                 });
             };
             this.clear = function (context) {
@@ -205,7 +185,6 @@ define("index", ["require", "exports", "lodash", "cookie"], function (require, e
                 }
             };
             this.restoreFilter = function (context) {
-                var store = _this._store;
                 var localState = {};
                 var cookieState = {};
                 if (filterSaveMethod === 'localStorage') {
@@ -221,7 +200,6 @@ define("index", ["require", "exports", "lodash", "cookie"], function (require, e
                 mergeState(lodash_2.merge(localState, cookieState));
             };
             this.restore = function (context) {
-                var store = _this._store;
                 var cookieState = {};
                 var _a = filters(), cookie = _a.cookie, session = _a.session, local = _a.local;
                 if (cookie) {
@@ -248,9 +226,17 @@ define("index", ["require", "exports", "lodash", "cookie"], function (require, e
                 mergeState(lodash_2.merge(sessionState, localState, cookieState));
             };
             this.saveFilter = function (state, context) {
-                var filterOnly = dynamicFilter ?
-                    [dynamicFilter.local, dynamicFilter.cookie, dynamicFilter.session] :
-                    undefined;
+                var filterOnly = [];
+                var dynamicLocal = dynamicFilter.local, dynamicCookie = dynamicFilter.cookie, dynamicSession = dynamicFilter.session;
+                if (dynamicLocal) {
+                    filterOnly.push(dynamicLocal);
+                }
+                if (dynamicCookie) {
+                    filterOnly.push(dynamicCookie);
+                }
+                if (dynamicSession) {
+                    filterOnly.push(dynamicSession);
+                }
                 if (filterSaveMethod === 'localStorage') {
                     if (!isClient()) {
                         return;
@@ -268,7 +254,7 @@ define("index", ["require", "exports", "lodash", "cookie"], function (require, e
                 if (cookie && cookies) {
                     /* istanbul ignore next */
                     var _b = cookie.options, options_1 = _b === void 0 ? {} : _b;
-                    cookies.set(key, storeExceptOrOnly(state, cookie.except, cookie.only), __assign({ path: '/' }, options_1));
+                    cookies.set(key, storeExceptOrOnly(state, cookie.except, cookie.only), tslib_2.__assign({ path: '/' }, options_1));
                 }
                 if (!isClient()) {
                     return;
@@ -314,7 +300,7 @@ define("index", ["require", "exports", "lodash", "cookie"], function (require, e
                     window.onNuxtReady(function () { return (plugin(store)); });
                     return;
                 }
-                if (process.server) {
+                if (process && process.server) {
                     return;
                 }
                 plugin(store);

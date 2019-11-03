@@ -1,14 +1,4 @@
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
+import { __assign } from "tslib";
 import { cloneDeep, get, merge, omit, pick } from 'lodash';
 import Cookies from './cookie';
 export var DEFAULT_KEY = 'vuex';
@@ -37,7 +27,7 @@ var VuexStorage = /** @class */ (function () {
     function VuexStorage(options) {
         var _this = this;
         if (options === void 0) { options = {}; }
-        var _a = options.restore, restore = _a === void 0 ? true : _a, _b = options.strict, strict = _b === void 0 ? false : _b, _c = options.key, key = _c === void 0 ? DEFAULT_KEY : _c, _d = options.mutationName, mutationName = _d === void 0 ? DEFAULT_MUTATION_NAME : _d, _e = options.storageFirst, storageFirst = _e === void 0 ? true : _e, dynamicFilter = options.filter, clientSide = options.clientSide, _f = options.filterSaveKey, filterSaveKey = _f === void 0 ? FILTERS_KEY : _f, _g = options.filterSaveMethod, filterSaveMethod = _g === void 0 ? DEFAULT_SAVE_METHOD : _g;
+        var _a = options.restore, restore = _a === void 0 ? true : _a, _b = options.strict, strict = _b === void 0 ? false : _b, _c = options.key, key = _c === void 0 ? DEFAULT_KEY : _c, _d = options.mutationName, mutationName = _d === void 0 ? DEFAULT_MUTATION_NAME : _d, _e = options.storageFirst, storageFirst = _e === void 0 ? true : _e, _f = options.filter, dynamicFilter = _f === void 0 ? {} : _f, clientSide = options.clientSide, _g = options.filterSaveKey, filterSaveKey = _g === void 0 ? FILTERS_KEY : _g, _h = options.filterSaveMethod, filterSaveMethod = _h === void 0 ? DEFAULT_SAVE_METHOD : _h;
         var isClient = function () {
             if (typeof clientSide === 'function') {
                 return clientSide(_this._store, options);
@@ -49,9 +39,9 @@ var VuexStorage = /** @class */ (function () {
         };
         var getStateFilter = function (dynamicFilter) {
             return {
-                cookie: get(_this._store.state, dynamicFilter.cookie),
-                session: get(_this._store.state, dynamicFilter.session),
-                local: get(_this._store.state, dynamicFilter.local),
+                cookie: get(_this._store.state, dynamicFilter.cookie || ''),
+                session: get(_this._store.state, dynamicFilter.session || ''),
+                local: get(_this._store.state, dynamicFilter.local || ''),
             };
         };
         var filters = function () {
@@ -63,9 +53,9 @@ var VuexStorage = /** @class */ (function () {
         this.mutationName = mutationName;
         this.mutation = function (state, payload) {
             // eslint-disable-next-line consistent-this
-            var that = this;
+            var _vm = this._vm;
             Object.keys(payload).forEach(function (moduleKey) {
-                that._vm.$set(state, moduleKey, payload[moduleKey]);
+                _vm.$set(state, moduleKey, payload[moduleKey]);
             });
         };
         this.clear = function (context) {
@@ -96,7 +86,6 @@ var VuexStorage = /** @class */ (function () {
             }
         };
         this.restoreFilter = function (context) {
-            var store = _this._store;
             var localState = {};
             var cookieState = {};
             if (filterSaveMethod === 'localStorage') {
@@ -112,7 +101,6 @@ var VuexStorage = /** @class */ (function () {
             mergeState(merge(localState, cookieState));
         };
         this.restore = function (context) {
-            var store = _this._store;
             var cookieState = {};
             var _a = filters(), cookie = _a.cookie, session = _a.session, local = _a.local;
             if (cookie) {
@@ -139,9 +127,17 @@ var VuexStorage = /** @class */ (function () {
             mergeState(merge(sessionState, localState, cookieState));
         };
         this.saveFilter = function (state, context) {
-            var filterOnly = dynamicFilter ?
-                [dynamicFilter.local, dynamicFilter.cookie, dynamicFilter.session] :
-                undefined;
+            var filterOnly = [];
+            var dynamicLocal = dynamicFilter.local, dynamicCookie = dynamicFilter.cookie, dynamicSession = dynamicFilter.session;
+            if (dynamicLocal) {
+                filterOnly.push(dynamicLocal);
+            }
+            if (dynamicCookie) {
+                filterOnly.push(dynamicCookie);
+            }
+            if (dynamicSession) {
+                filterOnly.push(dynamicSession);
+            }
             if (filterSaveMethod === 'localStorage') {
                 if (!isClient()) {
                     return;
@@ -205,7 +201,7 @@ var VuexStorage = /** @class */ (function () {
                 window.onNuxtReady(function () { return (plugin(store)); });
                 return;
             }
-            if (process.server) {
+            if (process && process.server) {
                 return;
             }
             plugin(store);
