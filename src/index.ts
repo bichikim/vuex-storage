@@ -254,7 +254,7 @@ export default class VuexStorage<S extends any> {
         window.onNuxtReady(() => (plugin(store)))
         return
       }
-      if(process.server) {
+      if(!isClient() && process && process.server) {
         return
       }
       plugin(store)

@@ -1,5 +1,4 @@
-import { ActionContext, Mutation } from 'vuex';
-import { Plugin } from 'vuex';
+import { ActionContext, Mutation, Plugin } from 'vuex';
 import { INuxtContext, IVuexStorageOptions } from './types';
 export declare const DEFAULT_KEY = "vuex";
 export declare const FILTERS_KEY = "vuex-filters";
