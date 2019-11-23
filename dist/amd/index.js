@@ -1,7 +1,21 @@
-define("cookie", ["require", "exports", "tslib", "cookie", "lodash"], function (require, exports, tslib_1, cookie, lodash_1) {
+define("lodash", ["require", "exports", "tslib", "lodash.clonedeep", "lodash.get", "lodash.merge", "lodash.omit", "lodash.pick"], function (require, exports, tslib_1, lodash_clonedeep_1, lodash_get_1, lodash_merge_1, lodash_omit_1, lodash_pick_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    cookie = tslib_1.__importStar(cookie);
+    lodash_clonedeep_1 = tslib_1.__importDefault(lodash_clonedeep_1);
+    lodash_get_1 = tslib_1.__importDefault(lodash_get_1);
+    lodash_merge_1 = tslib_1.__importDefault(lodash_merge_1);
+    lodash_omit_1 = tslib_1.__importDefault(lodash_omit_1);
+    lodash_pick_1 = tslib_1.__importDefault(lodash_pick_1);
+    exports.cloneDeep = lodash_clonedeep_1.default;
+    exports.get = lodash_get_1.default;
+    exports.merge = lodash_merge_1.default;
+    exports.omit = lodash_omit_1.default;
+    exports.pick = lodash_pick_1.default;
+});
+define("cookie", ["require", "exports", "tslib", "cookie", "lodash"], function (require, exports, tslib_2, cookie, lodash_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    cookie = tslib_2.__importStar(cookie);
     var SET_COOKIE = 'set-cookie';
     var Cookies = /** @class */ (function () {
         function Cookies(options, isClient) {
@@ -56,7 +70,7 @@ define("cookie", ["require", "exports", "tslib", "cookie", "lodash"], function (
             if (_req && (_req.cookies || _req.headers)) {
                 var _cookie_1 = _req.cookies || _req.headers.cookie;
                 if (typeof _cookie_1 === 'object') {
-                    this._cookies = tslib_1.__assign({}, _cookie_1);
+                    this._cookies = tslib_2.__assign({}, _cookie_1);
                 }
                 else {
                     this._cookies = cookie.parse(_cookie_1, options);
@@ -96,10 +110,10 @@ define("types", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("index", ["require", "exports", "tslib", "lodash", "cookie"], function (require, exports, tslib_2, lodash_2, cookie_1) {
+define("index", ["require", "exports", "tslib", "cookie", "lodash"], function (require, exports, tslib_3, cookie_1, lodash_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    cookie_1 = tslib_2.__importDefault(cookie_1);
+    cookie_1 = tslib_3.__importDefault(cookie_1);
     exports.DEFAULT_KEY = 'vuex';
     exports.FILTERS_KEY = 'vuex-filters';
     exports.DEFAULT_SAVE_METHOD = 'localStorage';
@@ -254,7 +268,7 @@ define("index", ["require", "exports", "tslib", "lodash", "cookie"], function (r
                 if (cookie && cookies) {
                     /* istanbul ignore next */
                     var _b = cookie.options, options_1 = _b === void 0 ? {} : _b;
-                    cookies.set(key, storeExceptOrOnly(state, cookie.except, cookie.only), tslib_2.__assign({ path: '/' }, options_1));
+                    cookies.set(key, storeExceptOrOnly(state, cookie.except, cookie.only), tslib_3.__assign({ path: '/' }, options_1));
                 }
                 if (!isClient()) {
                     return;

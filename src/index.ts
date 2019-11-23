@@ -1,7 +1,6 @@
-import {cloneDeep, get, merge, omit, pick} from 'lodash'
 import {ActionContext, Mutation, Plugin, Store} from 'vuex'
-
 import Cookies from './cookie'
+import {cloneDeep, get, merge, omit, pick} from './lodash'
 import {IDynamicFilterObj, IFilters, INuxtContext, IVuexStorageOptions} from './types'
 
 export const DEFAULT_KEY = 'vuex'

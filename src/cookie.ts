@@ -1,6 +1,6 @@
 import * as cookie from 'cookie'
 import {Request, Response} from 'express'
-import {merge} from 'lodash'
+import {merge} from './lodash'
 
 const SET_COOKIE = 'set-cookie'
 
