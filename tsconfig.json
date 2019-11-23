@@ -11,9 +11,9 @@
     /* Specify library files to be included in the compilation. */
     "lib": ["esnext", "dom"],
     /* Allow javascript files to be compiled. */
-    "allowJs": true,
+    "allowJs": false,
     /* Generates corresponding '.d.ts' file. */
-    "declaration": false,
+    "declaration": true,
     /* Generates corresponding '.map' file. */
     "sourceMap": true,
     /* Redirect output structure to the directory. */

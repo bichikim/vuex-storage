@@ -6,22 +6,14 @@ const TsconfigPathsWebpackPlugin = require('tsconfig-paths-webpack-plugin')
 const resolve = (dir) => {
   return path.join(__dirname, '..', dir)
 }
-const tsTranspileOnly = process.env.TS_TRANSPILE_ONLY === 'true'
-const packageJson = require('../package.json')
-module.exports = ({mode = 'bundle'} = {}) => {
+const _tsTranspileOnly = process.env.TS_TRANSPILE_ONLY === 'true'
+module.exports = ({mode = 'bundle', tsTranspileOnly = _tsTranspileOnly} = {}) => {
   const tsConfigFile = process.env.TS_CONFIG_FILE || `tsconfig.${mode}.json`
   return {
     entry: {
-      app: ['./src/index.ts'],
+      index: ['./src/index.ts'],
     },
-    output: {
-      path: resolve('dist/bundle'),
-      filename: '[name].js',
-      pathinfo: true,
-      library: packageJson.name,
-      libraryTarget: 'umd',
-      globalObject: 'this',
-    },
+
     resolve: {
       extensions: [
         '.js', '.jsx', '.mjs', '.json',
