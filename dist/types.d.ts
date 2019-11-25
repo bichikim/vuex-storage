@@ -4,13 +4,15 @@ import { Store } from 'vuex';
 export interface IFilterOptions {
     except?: string[];
     only?: string[];
+}
+export interface ICookieFilterOptions extends IFilterOptions {
     options?: CookieSerializeOptions;
 }
 export interface IFilters {
     /**
      * Cookie storage filter option
      */
-    cookie?: IFilterOptions;
+    cookie?: ICookieFilterOptions;
     /**
      * Session storage filter option
      */
