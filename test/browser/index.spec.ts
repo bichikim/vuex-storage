@@ -18,9 +18,9 @@ interface IDefaultState {
 }
 
 describe('vuex-storage', () => {
-  if(!window.process) {
-    window.process = {} as any
-  }
+  // if(!window.process) {
+  //   window.process = {} as any
+  // }
   Vue.config.productionTip = false
   Vue.config.devtools = false
   Vue.use(Vuex)

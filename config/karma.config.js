@@ -12,7 +12,6 @@ module.exports = function (config) {
     frameworks: ['mocha', 'chai'],
     reporters: ['spec','coverage-istanbul'],
     files: [
-      // eslint-disable-next-line @typescript-eslint/indent
       'config/karma.polyfill.js',
       {pattern: 'test/browser/**/*.spec.js', watched: false},
       {pattern: 'test/browser/**/*.spec.ts', watched: false},

@@ -1,4 +1,3 @@
---require test/ts-node-config
---require ts-node/register
 --require tsconfig-paths/register
-
+--require test/require.js
+--file test/init-before.ts
