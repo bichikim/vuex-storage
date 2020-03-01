@@ -34,7 +34,7 @@ describe('vuex-storage', () => {
       cookie: '__cookie',
     },
   }
-  const state: StoreOptions<IDefaultState | any> = {
+  const storeOptions: StoreOptions<IDefaultState | any> = {
     state: {
       localTest: null,
       sessionTest: null,
@@ -203,8 +203,9 @@ describe('vuex-storage', () => {
     it('should not run plugin twice', () => {
       const twice = () => {
         const vuexStorage = new VuexStorage(vuexStorageOptions)
+        // eslint-disable-next-line
         const test = new Vuex.Store({
-          ...cloneDeep(state),
+          ...cloneDeep(storeOptions),
           plugins: [
             vuexStorage.plugin,
             vuexStorage.plugin,
@@ -222,7 +223,7 @@ describe('vuex-storage', () => {
         clientSide: () => (true),
       })
       const store = new Vuex.Store({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [
           vuexStorage.plugin,
         ],
@@ -239,7 +240,7 @@ describe('vuex-storage', () => {
     it('should restore for local, session & cookie', function test() {
       const vuexStorage = new VuexStorage(vuexStorageOptions)
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
       })
       expect(store.state.localTest).to.equal('test')
@@ -258,7 +259,7 @@ describe('vuex-storage', () => {
         key: keySec,
       })
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
       })
 
@@ -278,7 +279,7 @@ describe('vuex-storage', () => {
         restore: false,
       })
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
       })
       expect(store.state.localTest).to.equal(null)
@@ -294,7 +295,7 @@ describe('vuex-storage', () => {
     it('should not restore with no options', function test() {
       const vuexStorage = new VuexStorage()
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
       })
       expect(store.state.localTest).to.equal(null)
@@ -312,10 +313,10 @@ describe('vuex-storage', () => {
         ...vuexStorageOptions,
       })
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
         modules: {
-          ...state.modules,
+          ...storeOptions.modules,
           __local: {},
           __session: {},
           __cookie: {},
@@ -336,10 +337,10 @@ describe('vuex-storage', () => {
         ...vuexStorageOptions,
       })
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
         modules: {
-          ...state.modules,
+          ...storeOptions.modules,
           __local: {
             state: {
               except: ['deepLocalTest.bar'],
@@ -373,10 +374,10 @@ describe('vuex-storage', () => {
         strict: true,
       })
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
         mutations: {
-          ...state.mutations,
+          ...storeOptions.mutations,
           [vuexStorage.mutationName]: vuexStorage.mutation,
         },
         strict: true,
@@ -399,10 +400,10 @@ describe('vuex-storage', () => {
         mutationName,
       })
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
         mutations: {
-          ...state.mutations,
+          ...storeOptions.mutations,
           [mutationName]: vuexStorage.mutation,
         },
         strict: true,
@@ -423,7 +424,7 @@ describe('vuex-storage', () => {
         storageFirst: false,
       })
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         modules: {
           deepLocalTest: {
             namespaced: true,
@@ -485,7 +486,7 @@ describe('vuex-storage', () => {
         strict: true,
       })
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         state: {
           localTest: null,
           sessionTest: null,
@@ -533,7 +534,7 @@ describe('vuex-storage', () => {
         },
         strict: true,
         mutations: {
-          ...state.mutations,
+          ...storeOptions.mutations,
           [vuexStorage.mutationName]: vuexStorage.mutation,
         },
         plugins: [vuexStorage.plugin],
@@ -558,7 +559,7 @@ describe('vuex-storage', () => {
         clientSide: true,
       })
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
       })
       // noinspection JSUnusedAssignment
@@ -581,10 +582,10 @@ describe('vuex-storage', () => {
         strict: true,
       })
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
         modules: {
-          ...state.modules,
+          ...storeOptions.modules,
           __local: {
             namespaced: true,
             state: {
@@ -620,7 +621,7 @@ describe('vuex-storage', () => {
           },
         },
         mutations: {
-          ...state.mutations,
+          ...storeOptions.mutations,
           [vuexStorage.mutationName]: vuexStorage.mutation,
         },
         strict: true,
@@ -674,10 +675,10 @@ describe('vuex-storage', () => {
         ...vuexStorageOptions,
       })
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
         modules: {
-          ...state.modules,
+          ...storeOptions.modules,
           __local: {},
           __session: {},
           __cookie: {},
@@ -715,10 +716,10 @@ describe('vuex-storage', () => {
       cookies.set(key, {
       }, {path: '/'})
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
         modules: {
-          ...state.modules,
+          ...storeOptions.modules,
           __local: {},
           __session: {},
           __cookie: {},
@@ -743,7 +744,7 @@ describe('vuex-storage', () => {
     const CHANGE_SESSION_TEST = 'changeSessionTest'
     const CHANGE_COOKIE_TEST = 'changeCookieTest'
     const mutations = {
-      ...state.mutations,
+      ...storeOptions.mutations,
       [CHANGE_LOCAL_TEST](state: any) {
         state.localTest = CHANGE_RESULT
         state.deepLocalTest.foo = CHANGE_RESULT
@@ -763,7 +764,7 @@ describe('vuex-storage', () => {
     it('should save', function test() {
       const vuexStorage = new VuexStorage(vuexStorageOptions)
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
         mutations,
       })
@@ -802,7 +803,7 @@ describe('vuex-storage', () => {
     it('should save with dynamic filter', function test() {
       const vuexStorage = new VuexStorage(vuexStorageOptions)
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
         mutations,
       })
@@ -882,10 +883,10 @@ describe('vuex-storage', () => {
         ...vuexStorageOptions,
       })
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
         modules: {
-          ...state.modules,
+          ...storeOptions.modules,
           __local: {
             namespaced: true,
             mutations: {
@@ -961,10 +962,10 @@ describe('vuex-storage', () => {
         filterSaveKey,
       })
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
         modules: {
-          ...state.modules,
+          ...storeOptions.modules,
           __local: {
             namespaced: true,
             mutations: {
@@ -1057,7 +1058,7 @@ describe('vuex-storage', () => {
         clientSide: false,
       })
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
         actions: {
           nuxtServerInit(store, context) {
@@ -1084,7 +1085,7 @@ describe('vuex-storage', () => {
         restore: false,
       })
       const store = new Vuex.Store<any>({
-        ...cloneDeep(state),
+        ...cloneDeep(storeOptions),
         plugins: [vuexStorage.plugin],
         actions: {
           nuxtServerInit(store, context) {
@@ -1102,6 +1103,37 @@ describe('vuex-storage', () => {
       expect(store.state.cookieTest).to.equal(null)
       expect(store.state.deepCookieTest.foo).to.equal(null)
       expect(store.state.deepCookieTest.bar).to.equal(null)
+    })
+  })
+  describe('newIdentifier', function test() {
+    it('should reset Filter', function test() {
+      const _vuexStorageOptions = {...vuexStorageOptions, newIdentifier: () => ('1')}
+      const vuexStorage = new VuexStorage(_vuexStorageOptions)
+      const store = new Vuex.Store<any>({
+        ...cloneDeep(storeOptions),
+        plugins: [vuexStorage.plugin],
+      })
+      store.commit('__local/saveExcept', ['deepLocalTest.foo'])
+      // await new Promise((res) => (setTimeout(() => (res()), 1000)))
+      expect(JSON.parse(localStorage.getItem(FILTERS_KEY) || '{}').__local.except)
+        .to.deep.equal(['deepLocalTest.foo'])
+      {
+        const vuexStorage = new VuexStorage(_vuexStorageOptions)
+        const store = new Vuex.Store<any>({
+          ...cloneDeep(storeOptions),
+          plugins: [vuexStorage.plugin],
+        })
+        expect(store.state.__local.except).to.deep.equal(['deepLocalTest.foo'])
+      }
+      {
+        const _vuexStorageOptions = {...vuexStorageOptions, newIdentifier: () => ('2')}
+        const vuexStorage = new VuexStorage(_vuexStorageOptions)
+        const store = new Vuex.Store<any>({
+          ...cloneDeep(storeOptions),
+          plugins: [vuexStorage.plugin],
+        })
+        expect(store.state.__local.except).to.deep.equal(['deepLocalTest.bar'])
+      }
     })
   })
 })

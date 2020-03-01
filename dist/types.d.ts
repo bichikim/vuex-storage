@@ -60,34 +60,9 @@ export interface IVuexStorageOptions<S> {
     mutationName?: string;
     clientSide?: ((store: Store<S>, options: IVuexStorageOptions<S>) => boolean) | boolean;
     /**
-     * @deprecated
+     * Identifier to determine whether to reset the saved storage data
      */
-    isRun?: boolean;
-    /**
-     * @deprecated
-     * please use restore
-     */
-    isRestore?: boolean;
-    /**
-     * @deprecated
-     * please use strict
-     */
-    isStrictMode?: boolean;
-    /**
-     * @deprecated
-     * please use filter
-     */
-    local?: any;
-    /**
-     * @deprecated
-     * please use filter
-     */
-    session?: any;
-    /**
-     * @deprecated
-     * please use filter
-     */
-    cookie?: any;
+    newIdentifier?: () => string;
 }
 export interface INuxtContext {
     req: Request;

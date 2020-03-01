@@ -6,6 +6,7 @@ module.exports = {
       'useBuiltIns': 'entry',
     }],
   ],
+  'plugins': ['lodash'],
   'env': {
     'test': {
       'presets': ['@vue/babel-preset-jsx'],

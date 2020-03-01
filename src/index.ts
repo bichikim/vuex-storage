@@ -1,10 +1,11 @@
 import {ActionContext, Mutation, Plugin, Store} from 'vuex'
 import Cookies from './cookie'
-import {cloneDeep, get, merge, omit, pick} from './lodash'
+import {cloneDeep, get, merge, omit, pick} from 'lodash'
 import {IDynamicFilterObj, IFilters, INuxtContext, IVuexStorageOptions} from './types'
 
 export const DEFAULT_KEY = 'vuex'
 export const FILTERS_KEY = 'vuex-filters'
+export const IDENTIFIER_KEY = 'vuex-Identifier'
 export const DEFAULT_SAVE_METHOD = 'localStorage'
 export const DEFAULT_MUTATION_NAME = '__RESTORE_MUTATION'
 
@@ -33,6 +34,7 @@ export default class VuexStorage<S extends any> {
   readonly plugin: Plugin<S>
   readonly restore: (context?: INuxtContext) => void
   readonly restoreFilter: (context?: INuxtContext) => void
+  readonly isNew: () => boolean
   readonly save: (state: any, context?: INuxtContext) => void
   readonly saveFilter: (state: any, context?: INuxtContext) => void
   readonly clear: () => void
@@ -44,6 +46,7 @@ export default class VuexStorage<S extends any> {
       restore = true,
       strict = false,
       key = DEFAULT_KEY,
+      newIdentifier,
       mutationName = DEFAULT_MUTATION_NAME,
       storageFirst = true,
       filter: dynamicFilter = {},
@@ -117,6 +120,13 @@ export default class VuexStorage<S extends any> {
     }
 
     this.restoreFilter = (context?: INuxtContext) => {
+
+      // if an app is new do not need to restoreFilter
+      if(this.isNew()) {
+        return
+      }
+
+
       let localState = {}
       let cookieState = {}
 
@@ -136,6 +146,20 @@ export default class VuexStorage<S extends any> {
         }
       }
       mergeState(merge(localState, cookieState))
+    }
+
+    // Determine if new app by identifier
+    this.isNew = () => {
+      const oldIdentifier = localStorage.getItem(IDENTIFIER_KEY)
+
+      if(!newIdentifier) {
+        return false
+      }
+
+
+      const nextIdentifier = newIdentifier()
+      localStorage.setItem(IDENTIFIER_KEY, nextIdentifier)
+      return oldIdentifier !== nextIdentifier
     }
 
     this.restore = (context?: INuxtContext) => {
