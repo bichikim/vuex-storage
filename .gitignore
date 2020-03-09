@@ -5,7 +5,7 @@ flow-typed/npm/
 
 ## bundle folders
 public/
-#dist/
+dist/
 
 ## docs
 docs/
