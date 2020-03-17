@@ -1,6 +1,5 @@
 /* tslint:disable:no-require-imports */
 const path = require('path')
-const formatter = require('eslint-friendly-formatter')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const TsconfigPathsWebpackPlugin = require('tsconfig-paths-webpack-plugin')
 const resolve = (dir) => {
@@ -40,9 +39,6 @@ module.exports = ({mode = 'bundle', tsTranspileOnly = _tsTranspileOnly} = {}) =>
           test: /\.(js|ts|vue)/,
           use: [{
             loader: 'eslint-loader',
-            options: {
-              formatter,
-            },
           }],
           exclude: /node_modules/,
         },
