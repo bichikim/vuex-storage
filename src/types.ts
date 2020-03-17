@@ -46,35 +46,43 @@ export interface IDynamicFilterObj {
   local?: string
 }
 
-export interface IVuexStorageOptions<S> {
+/**
+ * @deprecated
+ */
+export interface IVuexStorageOptions<S> extends VuexStorageOptionsOptional<S> {
 
-  filterSaveMethod?: 'cookie' | 'localStorage'
-  filterSaveKey?: string
+}
+
+export type VuexStorageOptionsOptional<S> = Partial<VuexStorageOptions<S>>
+
+export interface VuexStorageOptions<S> {
+  filterSaveMethod: 'cookie' | 'localStorage'
+  filterSaveKey: string
 
   /**
    * Override cookie, session and local by state
    */
-  filter?: IDynamicFilterObj
+  filter: IDynamicFilterObj
 
   /**
    * Restore data from client storage
    */
-  restore?: boolean
+  restore: boolean
 
   /**
    * Supporting vuex strict
    */
-  strict?: boolean
+  strict: boolean
 
   /**
    * Override storage data to state
    * @default false
    */
-  storageFirst?: boolean
+  storageFirst: boolean
 
-  key?: string
+  key: string
 
-  mutationName?: string
+  mutationName: string
 
   clientSide?: ((store: Store<S>, options: IVuexStorageOptions<S>) => boolean) | boolean
 
@@ -82,6 +90,7 @@ export interface IVuexStorageOptions<S> {
    * Identifier to determine whether to reset the saved storage data
    */
   newIdentifier?: () => string,
+  newIdentifierSaveKey: string
 }
 
 export interface INuxtContext {
