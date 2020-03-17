@@ -239,11 +239,13 @@ export default class VuexStorage<S extends any> {
     const {key} = this._options
     const {cookie, session, local} = this.filters()
     const cookies = new Cookies(context, this.isClient())
+
     if(cookie && cookies) {
       /* istanbul ignore next */
       const {
         options = {},
       } = cookie
+
       cookies.set(
         key,
         storeExceptOrOnly(
@@ -257,7 +259,9 @@ export default class VuexStorage<S extends any> {
     if(!this.isClient()) {
       return
     }
+
     const {sessionStorage, localStorage} = window
+
     if(session) {
       sessionStorage.setItem(key,
         JSON.stringify(storeExceptOrOnly(state, session.except, session.only)))
@@ -266,10 +270,6 @@ export default class VuexStorage<S extends any> {
       localStorage.setItem(key,
         JSON.stringify(storeExceptOrOnly(state, local.except, local.only)))
     }
-  }
-
-  saveStore(store) {
-    this._store = store
   }
 
   plugin() {

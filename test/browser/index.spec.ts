@@ -222,7 +222,7 @@ describe('vuex-storage', () => {
         ...vuexStorageOptions,
         clientSide: () => (true),
       })
-      console.log(vuexStorage)
+
       const store = new Vuex.Store({
         ...cloneDeep(storeOptions),
         plugins: [
