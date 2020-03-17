@@ -156,18 +156,28 @@ const store = new Vuex.Store({
 * The vuex-storage restoring state from storage is going to wait for onNuxtReady calling
 **/
 
-
 ```
 
 ### Storage first mode
 Prohibit override defined state
 
 ```javascript
-import VuexStorage from './src'
-new VuexStorage({
-  storageFirst: false,
-  session: {},
-})
+  import VuexStorage from './src'
+  new VuexStorage({
+    storageFirst: false,
+    session: {},
+  })
+```
+
+### Refresh saved filter info
+```javascript
+  import VuexStorage from './src'
+  new VuexStorage({
+    storageFirst: false,
+    session: {},
+    // Determine if the returned information is different from the saved version and refresh the saved filter information if different
+    newIdentifier: () => (process.env.VERSION),
+  })
 ```
 
 ## VuexStorage Options
