@@ -45,6 +45,46 @@ export default class VuexStorage<S extends any> {
   private _store: Store<S>
   private readonly _options: VuexStorageOptions<S>
 
+  // prevent overriding this by the vuex
+  plugin = (store: Store<S>) => {
+    if(this._store) {
+      throw new Error('plugin install twice')
+    }
+
+    const {restore} = this._options
+
+    this._store = store
+
+    const plugin = (store: Store<S>) => {
+      this.restoreFilter()
+
+      // restore state
+      if(restore) {
+        this.restore()
+      }
+
+      this.clear()
+      this.saveFilter(store.state)
+      this.save(store.state)
+      store.subscribe((mutation, state) => {
+        this.clear()
+        this.saveFilter(state)
+        this.save(state)
+      })
+    }
+
+    if(this.isClient() && window.onNuxtReady) {
+      window.onNuxtReady(() => (plugin(store)))
+      return
+    }
+
+    if(!this.isClient() && process && process.server) {
+      return
+    }
+
+    plugin(store)
+  }
+
   constructor(options: VuexStorageOptionsOptional<S> = {}) {
     const {
       clientSide,
@@ -272,52 +312,6 @@ export default class VuexStorage<S extends any> {
     }
   }
 
-  plugin() {
-    // vuex will replace this
-    // so create this closure
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this
-
-    return function (store: Store<S>) {
-      if(self._store) {
-        throw new Error('plugin install twice')
-      }
-
-      const {restore} = self._options
-
-      self._store = store
-
-      const plugin = (store: Store<S>) => {
-        self.restoreFilter()
-
-        // restore state
-        if(restore) {
-          self.restore()
-        }
-
-        self.clear()
-        self.saveFilter(store.state)
-        self.save(store.state)
-        store.subscribe((mutation, state) => {
-          self.clear()
-          self.saveFilter(state)
-          self.save(state)
-        })
-      }
-
-      if(self.isClient() && window.onNuxtReady) {
-        window.onNuxtReady(() => (plugin(store)))
-        return
-      }
-
-      if(!self.isClient() && process && process.server) {
-        return
-      }
-
-      plugin(store)
-    }
-
-  }
 
   nuxtServerInit(actionContext: ActionContext<S, S>, nuxtContext: INuxtContext) {
     const {restore} = this._options
