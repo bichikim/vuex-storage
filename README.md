@@ -65,10 +65,7 @@ const store = new Vuex.Store({
     }
   },
   plugins: [
-    // please register the vuex-storage plugin
-    vuexStorage.plugin()
-    // ~2.1.0
-    // vuexStorage.plugin
+    vuexStorage.plugin
   ]
 })
 
@@ -113,7 +110,7 @@ const store = new Vuex.Store({
   },
 
   plugins: [
-    vuexStorage.plugin()
+    vuexStorage.plugin
   ],
 })
 
