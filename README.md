@@ -19,7 +19,7 @@ import VuexStorage from './src' // 'vuex-storage'
 // You should use Vuex
 Vue.use(Vuex)
 
-// create VuexStorage instant
+// create VuexStorage instance
 const vuexStorage = new VuexStorage({
   // Location with filter information specifying which state to save
   // The filter can be changed in running time
