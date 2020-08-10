@@ -29,9 +29,13 @@
   "keywords": [
     "typescript",
     "vuex",
-    "cookie",
-    "local-storage",
-    "sessoin-storage"
+    "store",
+    "vue",
+    "vue3",
+    "vuejs",
+    "vuejs3",
+    "redux",
+    "mobx"
   ],
   "bugs": {
     "url": "https://github.com/bichikim/vuex-storage/issues"
