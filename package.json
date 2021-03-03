@@ -81,7 +81,7 @@
     "node-mocks-http": "^1.8.0",
     "pascalcase": "^1.0.0",
     "postcss": "^7.0.21",
-    "pug": "^2.0.4",
+    "pug": "^3.0.1",
     "pug-loader": "^2.4.0",
     "pug-plain-loader": "^1.0.0",
     "regenerator-runtime": "^0.13.3",
